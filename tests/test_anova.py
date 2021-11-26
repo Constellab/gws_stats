@@ -14,8 +14,8 @@ class TestTrainer(BaseTestCase):
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         #---------------------------------------------------------------------
         #import data
-        table = Table.import_from_path(
-            File(path=os.path.join(test_dir, "./dataset2.csv")),  
+        dataset = Table.import_from_path(
+            File(path=os.path.join(test_dir, "./dataset1.csv")),  
             ConfigParams({
                 "delimiter":",", 
                 "header":0
@@ -25,8 +25,8 @@ class TestTrainer(BaseTestCase):
         #---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params = {'omit_nan' : True},
-            inputs = {'table': table},
+            params = {},
+            inputs = {'dataset': dataset},
             task_type = KruskalWallis
         )
         outputs = await tester.run()
@@ -35,10 +35,10 @@ class TestTrainer(BaseTestCase):
         #---------------------------------------------------------------------
         # run views
         tester = ViewTester(
-            view = kruskwal_result.view_stats_result_as_table({})
+            view = kruskwal_result.view_scores_as_table({})
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")
        
-        print(table)
+        print(dataset)
         print(kruskwal_result.get_result())
