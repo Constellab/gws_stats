@@ -98,7 +98,7 @@ class PairwiseKruskalWallis(Task):
         ref_col = params["reference_column"]
         #------------------------------
         # construction de la matrice des resultats pour chaque pairwise
-        all_result = np.empty([data.shape[1],])        # initialisation avec données artéfactuelles
+        all_result = np.empty([4,])        # initialisation avec données artéfactuelles
         if ref_col == "":
             #--------------------------
             # first column taken as a reference

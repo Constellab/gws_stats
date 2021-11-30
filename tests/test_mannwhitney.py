@@ -24,7 +24,7 @@ class TestTrainer(BaseTestCase):
         #---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params = {'reference_column': "data3", 'method': 'auto', 'alternative_hypothesis': 'two-sided'},
+            params = {'reference_column': "data1", 'method': 'auto', 'alternative_hypothesis': 'two-sided'},
             inputs = {'table': table},
             task_type = MannWhitney
         )

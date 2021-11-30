@@ -15,7 +15,7 @@ class TestTrainer(BaseTestCase):
         #---------------------------------------------------------------------
         #import data
         table = Table.import_from_path(
-            File(path=os.path.join(test_dir, "./dataset1.csv")),  
+            File(path=os.path.join(test_dir, "./dataset7.csv")),  
             ConfigParams({
                 "delimiter":",", 
                 "header":0
@@ -25,7 +25,7 @@ class TestTrainer(BaseTestCase):
         #---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params = {'omit_nan': True, 'reference_column': "data3"},
+            params = {'omit_nan': True, 'reference_column': "data1"},
             inputs = {'table': table},
             task_type = PairwiseKruskalWallis
         )

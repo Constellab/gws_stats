@@ -90,7 +90,8 @@ class TTestTwoSamplesPaired(Task):
         ref_col = params["reference_column"]
         #------------------------------
         # construction de la matrice des resultats pour chaque pairwise
-        all_result = np.empty([data.shape[1],])        # initialisation avec données artéfactuelles
+        all_result = np.empty([4,])        # initialisation avec données artéfactuelles
+        print(all_result)
         if ref_col == "":
             #--------------------------
             # first column taken as a reference
@@ -125,7 +126,7 @@ class TTestTwoSamplesPaired(Task):
                 stat_result = [ref_col, col_names[i], stat_result.statistic, stat_result.pvalue]
                 stat_result = np.array(stat_result)
                 all_result = np.vstack((all_result, stat_result))
-        
+
         #-------------------------------
         #suppression de la 1ère ligne artefactuelle qui a servi à initialiser "all_result"
         all_result = np.delete(all_result, 0, 0)        
