@@ -59,9 +59,10 @@ class MannWhitney(Task):
 
     * Output: a table listing the Mann-Whitney U statistic, and the associated p-value for each pairwise comparison testing. 
 
-    * Config Parameters: 
+    * Config Parameters:
     - "reference_column": the name of the reference sample for pairwise comparison testing. Set it to empty to use the first column of the table of samples as reference.
-    - "method": the method used to calculate teh p-value (either "auto", "asymptotic" or "exact"). Default method is set to "auto"
+    - "method": the method used to calculate the p-value (either "auto", "asymptotic", or "exact"). Default method is set to "auto".
+    - "alternative_hypothesis": the alternative hypothesis chosen for the testing (either "two-sided", "less", or "greater"). Default alternative hypothesis is set to "two-sided".
 
     Note: the "exact" method is recommended when there are no ties and when either sample size is less than 8. 
     The "exact" method is not corrected for ties, but no errors or warnings will be raised if there are ties in the data.
@@ -75,7 +76,8 @@ class MannWhitney(Task):
     output_specs = {'result' : MannWhitneyResult}
     config_specs = {
         "method": StrParam(default_value="auto", human_name="Method for p-value computation", short_description="Method used to calculate teh p-value"),
-        "reference_column": StrParam(default_value="", human_name="Reference column", short_description="The reference column for pairwise comparison testing. Set empty to use the first column as reference")
+        "reference_column": StrParam(default_value="", human_name="Reference column", short_description="The reference column for pairwise comparison testing. Set empty to use the first column as reference"),
+        "alternative_hypothesis": StrParam(default_value="two-sided", human_name="Alternative hypothesis", short_description="The alternative hypothesis chosen for the testing.")
     }
 
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
@@ -92,6 +94,7 @@ class MannWhitney(Task):
         col_names = table.column_names
         ref_col = params["reference_column"]
         method = params["method"]
+        alternat = params["alternative_hypothesis"]
 
         #------------------------------
         # construction de la matrice des resultats pour chaque pairwise
@@ -109,7 +112,7 @@ class MannWhitney(Task):
                     # removing NaN values from "data"
                     current_data = [[x for x in y if not np.isnan(x)] for y in current_data]
                     #------------------------
-                stat_result = mannwhitneyu(*current_data, method=method, alternative = 'two-sided')
+                stat_result = mannwhitneyu(*current_data, method=method, alternative = alternat)
                 stat_result = [ref_col, col_names[i], stat_result.statistic, stat_result.pvalue]
                 stat_result = np.array(stat_result)
                 all_result = np.vstack((all_result, stat_result))
@@ -128,7 +131,7 @@ class MannWhitney(Task):
                     # removing NaN values from "data"
                     current_data = [[x for x in y if not np.isnan(x)] for y in current_data]
                     #------------------------                
-                stat_result = mannwhitneyu(*current_data, method=method, alternative = 'two-sided')  
+                stat_result = mannwhitneyu(*current_data, method=method, alternative = alternat)  
                 stat_result = [ref_col, col_names[i], stat_result.statistic, stat_result.pvalue]
                 stat_result = np.array(stat_result)
                 all_result = np.vstack((all_result, stat_result))

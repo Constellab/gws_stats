@@ -2,7 +2,7 @@
 import os
 import numpy
 
-from gws_core import Dataset, DatasetImporter, Table
+from gws_core import Table
 from gws_stats import TTestTwoSamplesPaired
 from gws_core import Settings, GTest, BaseTestCase, TaskRunner, ViewTester, File, ConfigParams
 
@@ -14,7 +14,7 @@ class TestTrainer(BaseTestCase):
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         #---------------------------------------------------------------------
         table = Table.import_from_path(
-            File(path=os.path.join(test_dir, "./dataset6.csv")),  
+            File(path=os.path.join(test_dir, "./dataset7.csv")),  
             ConfigParams({
                 "delimiter":",", 
                 "header":0
@@ -23,8 +23,8 @@ class TestTrainer(BaseTestCase):
         #---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params = {},
-            inputs = {'dataset': table},
+            params = {'omit_nan': True, 'reference_column': "data1"},
+            inputs = {'table': table},
             task_type = TTestTwoSamplesPaired
         )
         outputs = await tester.run()
@@ -33,10 +33,16 @@ class TestTrainer(BaseTestCase):
         #---------------------------------------------------------------------
         # run views
         tester = ViewTester(
-            view = ttest2samppair_result.view_scores_as_table({})
+            view = ttest2samppair_result.view_stats_result_as_table({})
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")
+
+        tester = ViewTester(
+            view = ttest2samppair_result.view_stats_result_as_boxplot({})
+        )
+        dic = tester.to_dict()
+        self.assertEqual(dic["type"], "box-plot-view")       
        
         print(table)
         print(ttest2samppair_result.get_result())

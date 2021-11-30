@@ -69,7 +69,7 @@ class TTestTwoSamplesInd(Task):
     config_specs = {     
         "omit_nan": BoolParam(default_value=True, human_name="Omit NaN", short_description="Set True to omit NaN values, False to propagate NaN values."),
         "reference_column": StrParam(default_value="", human_name="Reference column", short_description="The reference column for pairwise comparison testing. Set empty to use the first column as reference"),
-        'equal_variance': BoolParam(default_value=True, human_name="Equal variance", short_description="Set True to assume that the populations have equal variance") 
+        'equal_variance': BoolParam(default_value=True, human_name="Equal variance", short_description="Set True to assume that the populations have equal variance")
     }
 
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
