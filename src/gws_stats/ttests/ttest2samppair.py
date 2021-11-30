@@ -58,7 +58,7 @@ class TTestTwoSamplesPaired(Task):
     * Output: a table listing the T-statistic, and the p-value for each pairwise comparison testing. 
     
     * Config Parameters: 
-    - "omit_nan": a boolean parameter setting whether NaN values in the sample measurements are omitted or not. Set True to omit NaN values, False to propagate NaN values
+    - "omit_nan": a boolean parameter setting whether paired data containing NaN values in the sample measurements are omitted or not. Set True to omit paired data with NaN values, False to propagate NaN values
     - "reference_column": the name of the reference sample for pairwise comparison testing. Set it to empty to use the first column of the table of samples as reference.
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_rel.html 
@@ -81,7 +81,7 @@ class TTestTwoSamplesPaired(Task):
         omit_nan = params["omit_nan"]
         if omit_nan:
             if array_has_nan:
-                self.log_warning_message("Data contain NaN values. NaN values are omitted.")
+                self.log_warning_message("Data contain NaN values. The paired data containing NaN values are omitted.")
         else:
             if array_has_nan:
                 self.log_warning_message("Data contain NaN values. NaN values are propagated.")
@@ -91,7 +91,6 @@ class TTestTwoSamplesPaired(Task):
         #------------------------------
         # construction de la matrice des resultats pour chaque pairwise
         all_result = np.empty([4,])        # initialisation avec données artéfactuelles
-        print(all_result)
         if ref_col == "":
             #--------------------------
             # first column taken as a reference
@@ -118,7 +117,6 @@ class TTestTwoSamplesPaired(Task):
             indeces.pop(nb_ref_col)
             for i in indeces:
                 current_data = [ref_sample, data[i,:]]
-                print(current_data)
                 if omit_nan:
                     stat_result = ttest_rel(*current_data, nan_policy='omit')  
                 else:

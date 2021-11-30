@@ -14,7 +14,7 @@ class TestTrainer(BaseTestCase):
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         #---------------------------------------------------------------------
         table = Table.import_from_path(
-            File(path=os.path.join(test_dir, "./dataset7.csv")),  
+            File(path=os.path.join(test_dir, "./dataset1.csv")),  
             ConfigParams({
                 "delimiter":",", 
                 "header":0
