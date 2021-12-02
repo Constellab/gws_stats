@@ -14,7 +14,7 @@ class TestTrainer(BaseTestCase):
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         #---------------------------------------------------------------------
         table = Table.import_from_path(
-            File(path=os.path.join(test_dir, "./dataset1.csv")),  
+            File(path=os.path.join(test_dir, "./bacteria.csv")),  
             ConfigParams({
                 "delimiter":",", 
                 "header":0
@@ -24,7 +24,7 @@ class TestTrainer(BaseTestCase):
         #---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params = {'reference_column': "data1", 'method': 'auto', 'alternative_hypothesis': 'two-sided'},
+            params = {'reference_column': "T1", 'method': 'auto', 'alternative_hypothesis': 'two-sided'},
             inputs = {'table': table},
             task_type = MannWhitney
         )
