@@ -10,3 +10,6 @@ from .mannwhitney.mannwhitney import MannWhitney
 from .ttests.ttest1sample import TTestOneSample
 from .ttests.ttest2sampind import TTestTwoSamplesInd
 from .ttests.ttest2samppair import TTestTwoSamplesPaired
+
+# anova
+from .anova.pairwise_anova import PairwiseAnova
