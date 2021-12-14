@@ -3,25 +3,25 @@
 # The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
 # About us: https://gencovery.com
 
-from scipy.stats import f_oneway
+from scipy.stats import wilcoxon
 from pandas import DataFrame
 import numpy as np
 
 from gws_core import (Task, Resource, task_decorator, resource_decorator,
-                        ConfigParams, TaskInputs, TaskOutputs, IntParam, FloatParam, BoxPlotView,
-                        StrParam, BoolParam, ScatterPlot2DView, ScatterPlot3DView, TableView, view, ResourceRField, FloatRField, Resource, Table)
+                        ConfigParams, TaskInputs, TaskOutputs, IntParam, FloatParam, BoolParam, BarPlotView,
+                        StrParam, ScatterPlot2DView, ScatterPlot3DView, TableView, view, ResourceRField, FloatRField, Resource, Table)
 
 from ..view.stats_boxplot_view import StatsBoxPlotView
 from ..base.base_resource import BaseResource
 #==============================================================================
 #==============================================================================
 
-@resource_decorator("PairwiseAnovaResult", hide=True)
-class PairwiseAnovaResult(BaseResource):
+@resource_decorator("WilcoxonResult", hide=True)
+class WilcoxonResult(BaseResource):
     
     def get_result(self) -> DataFrame:
         stat_result = super().get_result()
-        columns = ['Column 1', 'Column 2', 'F-Statistic', 'p-value']
+        columns = ['Column 1', 'Column 2', 'T-Statistic', 'p-value']
         data = DataFrame(stat_result, columns=columns)
         return data
 
@@ -46,35 +46,28 @@ class PairwiseAnovaResult(BaseResource):
 #==============================================================================
 #==============================================================================
 
-@task_decorator("PairwiseAnova")
-class PairwiseAnova(Task):
+@task_decorator("Wilcoxon")
+class Wilcoxon(Task):
     """
-    Compute the one-way ANOVA test for pairwise samples, from a given reference sample.
+    Compute the T-test for the means of related samples, from a given reference sample.
     
-    The one-way ANOVA tests the null hypothesis that two or more groups have the same population mean.  
-    The test is applied to samples from two or more groups, possibly with differing sizes. It is a parametric 
-    version of the Kruskal-Wallis test.
+    This test is a two-sided test for the null hypothesis that 2 independent samples have identical average (expected) values. 
 
     * Input: a table containing the sample measurements, with the name of the samples.
 
-    * Output: a table listing the one-way ANOVA F statistic, and the p-value for each pairwise comparison testing. 
+    * Output: a table listing the T-statistic, and the p-value for each pairwise comparison testing. 
     
     * Config Parameters: 
+    - "omit_nan": a boolean parameter setting whether paired data containing NaN values in the sample measurements are omitted or not. Set True to omit paired data with NaN values, False to propagate NaN values
     - "reference_column": the name of the reference sample for pairwise comparison testing. Set it to empty to use the first column of the table of samples as reference.
 
-    Note: the ANOVA test has important assumptions that must be satisfied in order for the associated p-value to be valid.
-    1. The samples are independent.
-    2. Each sample is from a normally distributed population.
-    3. The population standard deviations of the groups are all equal.  This
-       property is known as homoscedasticity.
-    If these assumptions are not true for a given set of data, it may still be possible to use the Kruskal-Wallis H-test 
-    or the Alexander-Govern test although with some loss of power.
-    
-    For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.f_oneway.html
+    For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_rel.html 
     """
     input_specs = {'table' : Table}
-    output_specs = {'result' : PairwiseAnovaResult}
-    config_specs = {"reference_column": StrParam(default_value="", human_name="Reference column", short_description="The reference column for pairwise comparison testing. Set empty to use the first column as reference"),
+    output_specs = {'result' : WilcoxonResult}
+    config_specs = {     
+        "omit_nan": BoolParam(default_value=True, human_name="Omit NaN", short_description="Set True to omit NaN values, False to propagate NaN values."),
+        "reference_column": StrParam(default_value="", human_name="Reference column", short_description="The reference column for pairwise comparison testing. Set empty to use the first column as reference")
     }
 
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
@@ -85,12 +78,16 @@ class PairwiseAnova(Task):
 
         array_sum = np.sum(data)
         array_has_nan = np.isnan(array_sum)
-        if array_has_nan:
-            self.log_warning_message("Data contain NaN values.")
+        omit_nan = params["omit_nan"]
+        if omit_nan:
+            if array_has_nan:
+                self.log_warning_message("Data contain NaN values. The paired data containing NaN values are omitted.")
+        else:
+            if array_has_nan:
+                self.log_warning_message("Data contain NaN values. NaN values are propagated.")
 
         col_names = table.column_names
         ref_col = params["reference_column"]
-
         #------------------------------
         # construction de la matrice des resultats pour chaque pairwise
         all_result = np.empty([4,])        # initialisation avec données artéfactuelles
@@ -102,12 +99,11 @@ class PairwiseAnova(Task):
             #--------------------------
             for i in range(1, data.shape[0]):
                 current_data = [ref_sample, data[i,:]]
-                if array_has_nan:
-                    #------------------------
-                    # removing NaN values from "data"
-                    current_data = [[x for x in y if not np.isnan(x)] for y in current_data]
-                    #------------------------
-                stat_result = f_oneway(*current_data)
+                #print(current_data)
+                if omit_nan:
+                    stat_result = ttest_rel(*current_data, nan_policy='omit')  
+                else:
+                    stat_result = ttest_rel(*current_data, nan_policy='propagate')
                 stat_result = [ref_col, col_names[i], stat_result.statistic, stat_result.pvalue]
                 stat_result = np.array(stat_result)
                 all_result = np.vstack((all_result, stat_result))
@@ -121,22 +117,21 @@ class PairwiseAnova(Task):
             indeces.pop(nb_ref_col)
             for i in indeces:
                 current_data = [ref_sample, data[i,:]]
-                if array_has_nan:
-                    #------------------------
-                    # removing NaN values from "data"
-                    current_data = [[x for x in y if not np.isnan(x)] for y in current_data]
-                    #------------------------                
-                stat_result = f_oneway(*current_data)  
+                if omit_nan:
+                    stat_result = ttest_rel(*current_data, nan_policy='omit')  
+                else:
+                    stat_result = ttest_rel(*current_data, nan_policy='propagate')
                 stat_result = [ref_col, col_names[i], stat_result.statistic, stat_result.pvalue]
                 stat_result = np.array(stat_result)
                 all_result = np.vstack((all_result, stat_result))
-        
+
         #-------------------------------
         #suppression de la 1ère ligne artefactuelle qui a servi à initialiser "all_result"
         all_result = np.delete(all_result, 0, 0)        
-        #-------------------------------
-        result = PairwiseAnovaResult(result = all_result, table=table)        
         #print(all_result)
+        #-------------------------------
+        result = WilcoxonResult(result = all_result, table=table)
         return {'result': result}
+
 
 

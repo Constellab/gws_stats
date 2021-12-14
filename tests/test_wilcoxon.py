@@ -3,47 +3,46 @@ import os
 import numpy
 
 from gws_core import Table
-from gws_stats import PairwiseAnova
+from gws_stats import Wilcoxon
 from gws_core import Settings, GTest, BaseTestCase, TaskRunner, ViewTester, File, ConfigParams
 
 class TestTrainer(BaseTestCase):
 
     async def test_process(self):
-        self.print("Pairwise ANOVA Test")
+        self.print("Wicoxon Test")
         settings = Settings.retrieve()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         #---------------------------------------------------------------------
         table = Table.import_from_path(
-            File(path=os.path.join(test_dir, "./dataset1.csv")),  
+            File(path=os.path.join(test_dir, "./dataset7.csv")),  
             ConfigParams({
                 "delimiter":",", 
                 "header":0
             })
         )
-
         #---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params = {'reference_column': ""},
+            params = {'omit_nan': True, 'reference_column': "data1"},
             inputs = {'table': table},
-            task_type = PairwiseAnova
+            task_type = TTestTwoSamplesPaired
         )
         outputs = await tester.run()
-        anova_result = outputs['result']
+        ttest2samppair_result = outputs['result']
 
         #---------------------------------------------------------------------
         # run views
         tester = ViewTester(
-            view = anova_result.view_stats_result_as_table({})
+            view = ttest2samppair_result.view_stats_result_as_table({})
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")
 
         tester = ViewTester(
-            view = anova_result.view_stats_result_as_boxplot({})
+            view = ttest2samppair_result.view_stats_result_as_boxplot({})
         )
         dic = tester.to_dict()
-        self.assertEqual(dic["type"], "box-plot-view")
-
+        self.assertEqual(dic["type"], "box-plot-view")       
+       
         print(table)
-        print(anova_result.get_result())
+        print(ttest2samppair_result.get_result())

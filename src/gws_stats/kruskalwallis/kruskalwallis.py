@@ -17,6 +17,12 @@ from ..base.base_resource import BaseResource
 
 @resource_decorator("KruskalWallisResult", hide=True)
 class KruskalWallisResult(BaseResource):
+
+    def get_result(self) -> DataFrame:
+        stat_result = super().get_result()
+        columns = ['H-Statistic', 'p-value']
+        data = DataFrame([stat_result], columns=columns)
+        return data
     
     @view(view_type=TableView, human_name="StatTable", short_description="Table of statistic and p-value")
     def view_stats_result_as_table(self, params: ConfigParams) -> dict:
@@ -25,9 +31,7 @@ class KruskalWallisResult(BaseResource):
         """
 
         stat_result = self.get_result()
-        columns = ['H Statistic', 'p-value']
-        data = DataFrame([stat_result], columns=columns)
-        return TableView(data=data)
+        return TableView(data=stat_result)
 
 #==============================================================================
 #==============================================================================
@@ -49,7 +53,8 @@ class KruskalWallis(Task):
     * Output: the Kruskal-Wallis H statistic, corrected for ties, and the p-value for the test using the assumption that H has a chi
        square distribution. The p-value returned is the survival function of the chi square distribution evaluated at H.
 
-    * Config Parameters: a boolean parameter setting whether NaN values in the sample measurements are omitted or not. Set True to omit NaN values, False to propagate NaN values 
+    * Config Parameters: 
+    - "omit_nan": a boolean parameter setting whether NaN values in the sample measurements are omitted or not. Set True to omit NaN values, False to propagate NaN values 
 
     Note: due to the assumption that H has a chi square distribution, the number of samples in each group must not be too small.  A typical rule is 
     that each sample must have at least 5 measurements.
@@ -63,8 +68,8 @@ class KruskalWallis(Task):
     }
 
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
-        dataset = inputs['table']
-        data = dataset.get_data()
+        table = inputs['table']
+        data = table.get_data()
         data = data.to_numpy()
         data = data.T
 
@@ -83,7 +88,7 @@ class KruskalWallis(Task):
         
         stat_result = [stat_result.statistic, stat_result.pvalue]
         stat_result = np.array(stat_result)
-        result = KruskalWallisResult(result = stat_result)
+        result = KruskalWallisResult(result = stat_result, table=table)
         return {'result': result}
 
 
