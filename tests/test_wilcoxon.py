@@ -25,24 +25,24 @@ class TestTrainer(BaseTestCase):
         tester = TaskRunner(
             params = {'omit_nan': True, 'reference_column': "data1"},
             inputs = {'table': table},
-            task_type = TTestTwoSamplesPaired
+            task_type = Wilcoxon
         )
         outputs = await tester.run()
-        ttest2samppair_result = outputs['result']
+        wilcoxon_result = outputs['result']
 
         #---------------------------------------------------------------------
         # run views
         tester = ViewTester(
-            view = ttest2samppair_result.view_stats_result_as_table({})
+            view = wilcoxon_result.view_stats_result_as_table({})
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")
 
         tester = ViewTester(
-            view = ttest2samppair_result.view_stats_result_as_boxplot({})
+            view = wilcoxon_result.view_stats_result_as_boxplot({})
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "box-plot-view")       
        
         print(table)
-        print(ttest2samppair_result.get_result())
+        print(wilcoxon_result.get_result())
