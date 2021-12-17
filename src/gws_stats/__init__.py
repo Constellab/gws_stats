@@ -14,3 +14,6 @@ from .ttests.ttest2samppair import TTestTwoSamplesPaired
 # anova
 from .anova.pairwise_anova import PairwiseAnova
 from .anova.anova import Anova
+
+# wilcoxon
+from .wilcoxon.wilcoxon import Wilcoxon
