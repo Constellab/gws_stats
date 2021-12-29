@@ -14,7 +14,7 @@ class TestTrainer(BaseTestCase):
         settings = Settings.retrieve()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
-            File(path=os.path.join(test_dir, "./dataset5.csv")),
+            File(path=os.path.join(test_dir, "./dataset7.csv")),
             params={
                 "delimiter": ",",
                 "header": 0
@@ -25,7 +25,7 @@ class TestTrainer(BaseTestCase):
         # run statistical test
         tester = TaskRunner(
             params={'expected_value': 5},
-            inputs={'dataset': table},
+            inputs={'table': table},
             task_type=TTestOneSample
         )
         outputs = await tester.run()
@@ -34,7 +34,9 @@ class TestTrainer(BaseTestCase):
         # ---------------------------------------------------------------------
         # run views
         tester = ViewTester(
-            view=ttest1samp_result.view_scores_as_table({})
+            view=ttest1samp_result.view_statistics_table(
+                ConfigParams()
+            )
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")

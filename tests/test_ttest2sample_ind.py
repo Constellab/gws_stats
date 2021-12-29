@@ -1,10 +1,8 @@
-
 import os
 
-import numpy
 from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
                       TableImporter, TaskRunner, ViewTester)
-from gws_stats import TTestTwoSamplesInd
+from gws_stats import TTestTwoIndepSamples
 
 
 class TestTrainer(BaseTestCase):
@@ -24,25 +22,29 @@ class TestTrainer(BaseTestCase):
         # ---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params={'omit_nan': True, 'reference_column': "data1", 'equal_variance': True},
+            params={'equal_variance': True},
             inputs={'table': table},
-            task_type=TTestTwoSamplesInd
+            task_type=TTestTwoIndepSamples
         )
         outputs = await tester.run()
-        ttest2sampind_result = outputs['result']
+        ttest2sample_ind_result = outputs['result']
         # ---------------------------------------------------------------------
         # run views
         tester = ViewTester(
-            view=ttest2sampind_result.view_stats_result_as_table({})
+            view=ttest2sample_ind_result.view_statistics_table(
+                ConfigParams()
+            )
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")
 
         tester = ViewTester(
-            view=ttest2sampind_result.view_stats_result_as_boxplot({})
+            view=ttest2sample_ind_result.view_stats_result_as_boxplot(
+                ConfigParams()
+            )
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "box-plot-view")
 
         print(table)
-        print(ttest2sampind_result.get_result())
+        print(ttest2sample_ind_result.get_result())

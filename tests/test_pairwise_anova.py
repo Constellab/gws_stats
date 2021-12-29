@@ -1,10 +1,8 @@
-
 import os
 
-import numpy
 from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
                       TableImporter, TaskRunner, ViewTester)
-from gws_stats import PairwiseAnova
+from gws_stats import PairwiseOneWayAnova
 
 
 class TestTrainer(BaseTestCase):
@@ -24,9 +22,9 @@ class TestTrainer(BaseTestCase):
         # ---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params={'reference_column': ""},
+            params={},
             inputs={'table': table},
-            task_type=PairwiseAnova
+            task_type=PairwiseOneWayAnova
         )
         outputs = await tester.run()
         anova_result = outputs['result']
@@ -34,13 +32,31 @@ class TestTrainer(BaseTestCase):
         # ---------------------------------------------------------------------
         # run views
         tester = ViewTester(
-            view=anova_result.view_stats_result_as_table({})
+            view=anova_result.view_statistics_table(
+                ConfigParams()
+            )
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")
 
+        # ---------------------------------------------------------------------
+        # run views
         tester = ViewTester(
-            view=anova_result.view_stats_result_as_boxplot({})
+            view=anova_result.view_contingency_table(
+                ConfigParams({
+                    "metric": "p-value"
+                })
+            )
+        )
+        dic = tester.to_dict()
+        self.assertEqual(dic["type"], "table-view")
+
+        # ---------------------------------------------------------------------
+        # run views
+        tester = ViewTester(
+            view=anova_result.view_stats_result_as_boxplot(
+                ConfigParams()
+            )
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "box-plot-view")

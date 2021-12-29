@@ -24,7 +24,7 @@ class TestTrainer(BaseTestCase):
         # ---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params={'reference_column': "T1", 'mode': 'auto'},
+            params={'mode': 'auto'},
             inputs={'table': table},
             task_type=Wilcoxon
         )
@@ -34,13 +34,17 @@ class TestTrainer(BaseTestCase):
         # ---------------------------------------------------------------------
         # run views
         tester = ViewTester(
-            view=wilcoxon_result.view_stats_result_as_table({})
+            view=wilcoxon_result.view_statistics_table(
+                ConfigParams()
+            )
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")
 
         tester = ViewTester(
-            view=wilcoxon_result.view_stats_result_as_boxplot({})
+            view=wilcoxon_result.view_stats_result_as_boxplot(
+                ConfigParams()
+            )
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "box-plot-view")

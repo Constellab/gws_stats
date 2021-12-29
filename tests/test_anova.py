@@ -1,10 +1,8 @@
-
 import os
 
-import numpy
 from gws_core import (BaseTestCase, ConfigParams, DatasetImporter, File, GTest,
                       Settings, Table, TableImporter, TaskRunner, ViewTester)
-from gws_stats import Anova
+from gws_stats import OneWayAnova
 
 
 class TestTrainer(BaseTestCase):
@@ -26,7 +24,7 @@ class TestTrainer(BaseTestCase):
         tester = TaskRunner(
             params={},
             inputs={'table': table},
-            task_type=Anova
+            task_type=OneWayAnova
         )
         outputs = await tester.run()
         anova_result = outputs['result']
@@ -34,7 +32,7 @@ class TestTrainer(BaseTestCase):
         # ---------------------------------------------------------------------
         # run views
         tester = ViewTester(
-            view=anova_result.view_stats_result_as_table({})
+            view=anova_result.view_statistics_table(ConfigParams())
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")

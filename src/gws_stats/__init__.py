@@ -8,12 +8,12 @@ from .mannwhitney.mannwhitney import MannWhitney
 
 # ttests
 from .ttests.ttest1sample import TTestOneSample
-from .ttests.ttest2sampind import TTestTwoSamplesInd
-from .ttests.ttest2samppair import TTestTwoSamplesPaired
+from .ttests.ttest2sample_ind import TTestTwoIndepSamples
+from .ttests.ttest2sample_rel import TTestTwoRelatedSamples
 
 # anova
-from .anova.pairwise_anova import PairwiseAnova
-from .anova.anova import Anova
+from .anova.pairwise_anova import PairwiseOneWayAnova
+from .anova.anova import OneWayAnova
 
 # wilcoxon
 from .wilcoxon.wilcoxon import Wilcoxon

@@ -4,7 +4,7 @@ import os
 import numpy
 from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
                       TableImporter, TaskRunner, ViewTester)
-from gws_stats import TTestTwoSamplesPaired
+from gws_stats import TTestTwoRelatedSamples
 
 
 class TestTrainer(BaseTestCase):
@@ -24,26 +24,30 @@ class TestTrainer(BaseTestCase):
         # ---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params={'omit_nan': True, 'reference_column': "data1"},
+            params={},
             inputs={'table': table},
-            task_type=TTestTwoSamplesPaired
+            task_type=TTestTwoRelatedSamples
         )
         outputs = await tester.run()
-        ttest2samppair_result = outputs['result']
+        ttest2sample_rel_result = outputs['result']
 
         # ---------------------------------------------------------------------
         # run views
         tester = ViewTester(
-            view=ttest2samppair_result.view_stats_result_as_table({})
+            view=ttest2sample_rel_result.view_statistics_table(
+                ConfigParams()
+            )
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")
 
         tester = ViewTester(
-            view=ttest2samppair_result.view_stats_result_as_boxplot({})
+            view=ttest2sample_rel_result.view_stats_result_as_boxplot(
+                ConfigParams()
+            )
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "box-plot-view")
 
         print(table)
-        print(ttest2samppair_result.get_result())
+        print(ttest2sample_rel_result.get_result())

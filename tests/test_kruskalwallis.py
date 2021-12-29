@@ -1,9 +1,7 @@
-
 import os
 
-import numpy
-from gws_core import (BaseTestCase, ConfigParams, DatasetImporter, File, GTest,
-                      Settings, Table, TableImporter, TaskRunner, ViewTester)
+from gws_core import (BaseTestCase, ConfigParams, File, Settings, Table,
+                      TableImporter, TaskRunner, ViewTester)
 from gws_stats import KruskalWallis
 
 
@@ -24,7 +22,7 @@ class TestTrainer(BaseTestCase):
         # ---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params={'omit_nan': True},
+            params={},
             inputs={'table': table},
             task_type=KruskalWallis
         )
@@ -34,7 +32,7 @@ class TestTrainer(BaseTestCase):
         # ---------------------------------------------------------------------
         # run views
         tester = ViewTester(
-            view=kruskwal_result.view_stats_result_as_table({})
+            view=kruskwal_result.view_statistics_table(ConfigParams())
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")

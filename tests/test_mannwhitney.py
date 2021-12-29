@@ -1,8 +1,6 @@
-
 import os
 
-import numpy
-from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
+from gws_core import (BaseTestCase, ConfigParams, File, Settings,
                       TableImporter, TaskRunner, ViewTester)
 from gws_stats import MannWhitney
 
@@ -24,7 +22,7 @@ class TestTrainer(BaseTestCase):
         # ---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params={'reference_column': "T1", 'method': 'auto', 'alternative_hypothesis': 'two-sided'},
+            params={'method': 'auto', 'alternative_hypothesis': 'two-sided'},
             inputs={'table': table},
             task_type=MannWhitney
         )
@@ -34,13 +32,19 @@ class TestTrainer(BaseTestCase):
         # ---------------------------------------------------------------------
         # run views
         tester = ViewTester(
-            view=mannwhitney_result.view_stats_result_as_table({})
+            view=mannwhitney_result.view_statistics_table(
+                ConfigParams({
+                    "metric": "p-value"
+                })
+            )
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")
 
         tester = ViewTester(
-            view=mannwhitney_result.view_stats_result_as_boxplot({})
+            view=mannwhitney_result.view_stats_result_as_boxplot(
+                ConfigParams()
+            )
         )
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "box-plot-view")

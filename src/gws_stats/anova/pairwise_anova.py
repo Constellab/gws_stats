@@ -1,142 +1,67 @@
 # LICENSE
-# This software is the exclusive property of Gencovery SAS. 
+# This software is the exclusive property of Gencovery SAS.
 # The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
 # About us: https://gencovery.com
 
-from scipy.stats import f_oneway
-from pandas import DataFrame
 import numpy as np
+from gws_core import ConfigParams, Table, resource_decorator, task_decorator
+from scipy.stats import f_oneway
 
-from gws_core import (Task, Resource, task_decorator, resource_decorator,
-                        ConfigParams, TaskInputs, TaskOutputs, IntParam, FloatParam, BoxPlotView,
-                        StrParam, BoolParam, ScatterPlot2DView, ScatterPlot3DView, TableView, view, ResourceRField, FloatRField, Resource, Table)
+from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
+from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 
-from ..view.stats_boxplot_view import StatsBoxPlotView
-from ..base.base_resource import BaseResource
-#==============================================================================
-#==============================================================================
+# *****************************************************************************
+#
+# PairwiseOneWayAnovaResult
+#
+# *****************************************************************************
 
-@resource_decorator("PairwiseAnovaResult", hide=True)
-class PairwiseAnovaResult(BaseResource):
-    
-    def get_result(self) -> DataFrame:
-        stat_result = super().get_result()
-        columns = ['Column 1', 'Column 2', 'F-Statistic', 'p-value']
-        data = DataFrame(stat_result, columns=columns)
-        return data
 
-    @view(view_type=TableView, human_name="StatTable", short_description="Table of statistic and p-value")
-    def view_stats_result_as_table(self, params: ConfigParams) -> TableView:
-        """
-        View stats Table
-        """
+@resource_decorator("PairwiseOneWayAnovaResult", hide=True)
+class PairwiseOneWayAnovaResult(BasePairwiseStatsResult):
+    STATISTICS_NAME = "F-Statistic"
 
-        stats_data = self.get_result()
-        return TableView(data=stats_data)
+# *****************************************************************************
+#
+# PairwiseOneWayAnova
+#
+# *****************************************************************************
 
-    @view(view_type=StatsBoxPlotView, human_name="StatBoxplot", short_description="Boxplot of data with statistic and p-value")
-    def view_stats_result_as_boxplot(self, params: ConfigParams) -> StatsBoxPlotView:
-        """
-        View stats with boxplot of data 
-        """
 
-        stats_data = self.get_result()
-        return StatsBoxPlotView(self.table, stats=stats_data)
-
-#==============================================================================
-#==============================================================================
-
-@task_decorator("PairwiseAnova")
-class PairwiseAnova(Task):
+@ task_decorator("PairwiseOneWayAnova")
+class PairwiseOneWayAnova(BasePairwiseStatsTask):
     """
     Compute the one-way ANOVA test for pairwise samples, from a given reference sample.
-    
-    The one-way ANOVA tests the null hypothesis that two or more groups have the same population mean.  
-    The test is applied to samples from two or more groups, possibly with differing sizes. It is a parametric 
+
+    The one-way ANOVA tests the null hypothesis that two or more groups have the same population mean.
+    The test is applied to samples from two or more groups, possibly with differing sizes. It is a parametric
     version of the Kruskal-Wallis test.
 
     * Input: a table containing the sample measurements, with the name of the samples.
 
-    * Output: a table listing the one-way ANOVA F statistic, and the p-value for each pairwise comparison testing. 
-    
-    * Config Parameters: 
-    - "reference_column": the name of the reference sample for pairwise comparison testing. Set it to empty to use the first column of the table of samples as reference.
+    * Output: a table listing the one-way ANOVA F statistic, and the p-value for each pairwise comparison testing.
+
+    * Config Parameters:
+    - "column_names": The columns used for pairwise comparison. By default, the first three columns are used.
 
     Note: the ANOVA test has important assumptions that must be satisfied in order for the associated p-value to be valid.
     1. The samples are independent.
     2. Each sample is from a normally distributed population.
     3. The population standard deviations of the groups are all equal.  This
        property is known as homoscedasticity.
-    If these assumptions are not true for a given set of data, it may still be possible to use the Kruskal-Wallis H-test 
+    If these assumptions are not true for a given set of data, it may still be possible to use the Kruskal-Wallis H-test
     or the Alexander-Govern test although with some loss of power.
-    
+
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.f_oneway.html
     """
-    input_specs = {'table' : Table}
-    output_specs = {'result' : PairwiseAnovaResult}
-    config_specs = {"reference_column": StrParam(default_value="", human_name="Reference column", short_description="The reference column for pairwise comparison testing. Set empty to use the first column as reference"),
+    input_specs = {'table': Table}
+    output_specs = {'result': PairwiseOneWayAnovaResult}
+    config_specs = {
+        **BasePairwiseStatsTask.config_specs
     }
 
-    async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
-        table = inputs['table']
-        data = table.get_data()
-        data = data.to_numpy()
-        data = data.T
-
-        array_sum = np.sum(data)
-        array_has_nan = np.isnan(array_sum)
-        if array_has_nan:
-            self.log_warning_message("Data contain NaN values.")
-
-        col_names = table.column_names
-        ref_col = params["reference_column"]
-
-        #------------------------------
-        # construction de la matrice des resultats pour chaque pairwise
-        all_result = np.empty([4,])        # initialisation avec données artéfactuelles
-        if ref_col == "":
-            #--------------------------
-            # first column taken as a reference
-            ref_col = col_names[0]
-            ref_sample = data[0,:]  
-            #--------------------------
-            for i in range(1, data.shape[0]):
-                current_data = [ref_sample, data[i,:]]
-                if array_has_nan:
-                    #------------------------
-                    # removing NaN values from "data"
-                    current_data = [[x for x in y if not np.isnan(x)] for y in current_data]
-                    #------------------------
-                stat_result = f_oneway(*current_data)
-                stat_result = [ref_col, col_names[i], stat_result.statistic, stat_result.pvalue]
-                stat_result = np.array(stat_result)
-                all_result = np.vstack((all_result, stat_result))
-        else:
-            #--------------------------
-            # "ref_col" taken as reference column
-            nb_ref_col = col_names.index(ref_col)
-            ref_sample = data[nb_ref_col,:]
-            #--------------------------
-            indeces = [i for i in range(data.shape[0])]
-            indeces.pop(nb_ref_col)
-            for i in indeces:
-                current_data = [ref_sample, data[i,:]]
-                if array_has_nan:
-                    #------------------------
-                    # removing NaN values from "data"
-                    current_data = [[x for x in y if not np.isnan(x)] for y in current_data]
-                    #------------------------                
-                stat_result = f_oneway(*current_data)  
-                stat_result = [ref_col, col_names[i], stat_result.statistic, stat_result.pvalue]
-                stat_result = np.array(stat_result)
-                all_result = np.vstack((all_result, stat_result))
-        
-        #-------------------------------
-        #suppression de la 1ère ligne artefactuelle qui a servi à initialiser "all_result"
-        all_result = np.delete(all_result, 0, 0)        
-        #-------------------------------
-        result = PairwiseAnovaResult(result = all_result, table=table)        
-        #print(all_result)
-        return {'result': result}
-
-
+    def compute_stats(self, current_data, ref_col, target_col, params: ConfigParams):
+        stat_result = f_oneway(*current_data)
+        stat_result = [ref_col, target_col, stat_result.statistic, stat_result.pvalue]
+        stat_result = np.array(stat_result)
+        return stat_result

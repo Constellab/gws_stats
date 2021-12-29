@@ -1,40 +1,32 @@
 # LICENSE
-# This software is the exclusive property of Gencovery SAS. 
+# This software is the exclusive property of Gencovery SAS.
 # The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
 # About us: https://gencovery.com
 
-from scipy.stats import kruskal
-from pandas import DataFrame
 import numpy as np
+from gws_core import (ConfigParams, ListParam, Table, Task, TaskInputs,
+                      TaskOutputs, resource_decorator, task_decorator)
+from scipy.stats import kruskal
 
-from gws_core import (Task, Resource, task_decorator, resource_decorator,
-                        ConfigParams, TaskInputs, TaskOutputs, IntParam, FloatParam, BoxPlotView,
-                        StrParam, BoolParam, ScatterPlot2DView, ScatterPlot3DView, TableView, view, ResourceRField, FloatRField, Resource, Table)
+from ..base.base_stats_result import BaseStatsResult
 
-from ..base.base_resource import BaseResource
-#==============================================================================
-#==============================================================================
+# *****************************************************************************
+#
+# KruskalWallisResult
+#
+# *****************************************************************************
+
 
 @resource_decorator("KruskalWallisResult", hide=True)
-class KruskalWallisResult(BaseResource):
+class KruskalWallisResult(BaseStatsResult):
+    pass
 
-    def get_result(self) -> DataFrame:
-        stat_result = super().get_result()
-        columns = ['H-Statistic', 'p-value']
-        data = DataFrame([stat_result], columns=columns)
-        return data
-    
-    @view(view_type=TableView, human_name="StatTable", short_description="Table of statistic and p-value")
-    def view_stats_result_as_table(self, params: ConfigParams) -> dict:
-        """
-        View stats Table
-        """
+# *****************************************************************************
+#
+# KruskalWallis
+#
+# *****************************************************************************
 
-        stat_result = self.get_result()
-        return TableView(data=stat_result)
-
-#==============================================================================
-#==============================================================================
 
 @task_decorator("KruskalWallis")
 class KruskalWallis(Task):
@@ -47,49 +39,45 @@ class KruskalWallis(Task):
     different sizes.  Note that rejecting the null hypothesis does not
     indicate which of the groups differs.  Post hoc comparisons between
     groups are required to determine which groups are different.
-    
+
     * Input: a table containing the sample measurements, with the name of the samples.
 
     * Output: the Kruskal-Wallis H statistic, corrected for ties, and the p-value for the test using the assumption that H has a chi
        square distribution. The p-value returned is the survival function of the chi square distribution evaluated at H.
 
-    * Config Parameters: 
-    - "omit_nan": a boolean parameter setting whether NaN values in the sample measurements are omitted or not. Set True to omit NaN values, False to propagate NaN values 
+    * Config Parameters:
+    - "column_names": The columns used for pairwise comparison. By default, the first three columns are used.
 
-    Note: due to the assumption that H has a chi square distribution, the number of samples in each group must not be too small.  A typical rule is 
+    Note: due to the assumption that H has a chi square distribution, the number of samples in each group must not be too small.  A typical rule is
     that each sample must have at least 5 measurements.
 
-    For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kruskal.html 
+    For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kruskal.html
     """
-    input_specs = {'table' : Table}
-    output_specs = {'result' : KruskalWallisResult}
-    config_specs = { 
-        "omit_nan": BoolParam(default_value=True, human_name="Omit NaN", short_description="Set True to omit NaN values, False to propagate NaN values.")
+    input_specs = {'table': Table}
+    output_specs = {'result': KruskalWallisResult}
+    config_specs = {
+        "column_names": ListParam(
+            default_value=[], human_name="Column names",
+            short_description="The names of the columns that represent the groups to compare")
     }
 
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs['table']
         data = table.get_data()
-        data = data.to_numpy()
-        data = data.T
 
+        column_names = params.get_value("column_names", [])
+        if not column_names:
+            column_names = data.columns[0:3]
+
+        data = data[column_names].to_numpy().T
         array_sum = np.sum(data)
         array_has_nan = np.isnan(array_sum)
-        omit_nan = params["omit_nan"]
 
-        if omit_nan:
-            if array_has_nan:
-                self.log_warning_message("Data contain NaN values. NaN values are omitted.")
-            stat_result = kruskal(*data, nan_policy='omit')  
-        else:
-            if array_has_nan:
-                self.log_warning_message("Data contain NaN values. NaN values are propagated.")
-            stat_result = kruskal(*data, nan_policy='propagate')
-        
+        if array_has_nan:
+            self.log_warning_message("Data contain NaN values. NaN values are omitted.")
+        stat_result = kruskal(*data, nan_policy='omit')
+
         stat_result = [stat_result.statistic, stat_result.pvalue]
         stat_result = np.array(stat_result)
-        result = KruskalWallisResult(result = stat_result, table=table)
+        result = KruskalWallisResult(result=stat_result, table=table)
         return {'result': result}
-
-
-
