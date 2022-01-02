@@ -4,8 +4,7 @@
 # About us: https://gencovery.com
 
 
-from gws_core import (ConfigParams, ListParam, Table, TableView,
-                      resource_decorator, view)
+from gws_core import ConfigParams, Table, TableView, resource_decorator, view
 from pandas import DataFrame
 
 from .base_resource import BaseResource

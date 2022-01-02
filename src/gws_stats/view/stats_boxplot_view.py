@@ -1,12 +1,16 @@
+# LICENSE
+# This software is the exclusive property of Gencovery SAS.
+# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
+# About us: https://gencovery.com
 
-from typing import Any, List
+from typing import Any
 
+from gws_core import BoxPlotView, ConfigParams
 from pandas import DataFrame
-from gws_core import BoxPlotView as BoxPlotView
-from gws_core import (ConfigParams)
+
 
 class StatsBoxPlotView(BoxPlotView):
-    
+
     _type: str = "box-plot-view"
     _stats: DataFrame = None
 
