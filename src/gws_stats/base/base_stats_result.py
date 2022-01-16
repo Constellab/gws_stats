@@ -25,7 +25,7 @@ class BaseStatsResult(BaseResource):
         data = DataFrame([stat_result], columns=columns)
         return data
 
-    @view(view_type=TabularView, default_view=True, human_name="StatisticsTable",
+    @view(view_type=TabularView, default_view=True, human_name="Statistics table",
           short_description="Table of statistic and p-value", specs={})
     def view_statistics_table(self, params: ConfigParams) -> dict:
         """

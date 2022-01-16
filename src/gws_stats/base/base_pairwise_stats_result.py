@@ -61,7 +61,7 @@ class BasePairwiseStatsResult(BaseResource):
 
         return cdata
 
-    @view(view_type=TabularView, default_view=True, human_name="StatisticsTable",
+    @view(view_type=TabularView, default_view=True, human_name="Statistics table",
           short_description="Table of statistic and p-value", specs={})
     def view_statistics_table(self, params: ConfigParams) -> TabularView:
         """
@@ -73,7 +73,7 @@ class BasePairwiseStatsResult(BaseResource):
         t_view.set_data(data=data)
         return t_view
 
-    @view(view_type=TabularView, default_view=True, human_name="ContingencyTable",
+    @view(view_type=TabularView, default_view=True, human_name="Contingency table",
           short_description="The contingency table of P-Values",
           specs={
               "metric": StrParam(
@@ -90,7 +90,7 @@ class BasePairwiseStatsResult(BaseResource):
         t_view.set_data(data=data)
         return t_view
 
-    @view(view_type=HeatmapView, default_view=True, human_name="ContingencyMap",
+    @view(view_type=HeatmapView, default_view=True, human_name="Contingency map",
           short_description="The contingency table of P-Values as HeatMap", specs={})
     def view_contingency_map(self, params: ConfigParams) -> HeatmapView:
         """
