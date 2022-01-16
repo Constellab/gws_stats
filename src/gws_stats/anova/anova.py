@@ -4,9 +4,8 @@
 # About us: https://gencovery.com
 
 import numpy as np
-from gws_core import (ConfigParams, ListParam, Table, TableView, Task,
-                      TaskInputs, TaskOutputs, resource_decorator,
-                      task_decorator, view)
+from gws_core import (ConfigParams, ListParam, Table, Task, TaskInputs,
+                      TaskOutputs, resource_decorator, task_decorator, view)
 from pandas import DataFrame
 from scipy.stats import f_oneway
 

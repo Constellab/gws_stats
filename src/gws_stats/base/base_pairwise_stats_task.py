@@ -7,8 +7,8 @@ from abc import abstractmethod
 
 import numpy as np
 from gws_core import (ConfigParams, HeatmapView, ListParam, StrParam, Table,
-                      TableView, Task, TaskInputs, TaskOutputs,
-                      resource_decorator, task_decorator, view)
+                      Task, TaskInputs, TaskOutputs, resource_decorator,
+                      task_decorator, view)
 from pandas import concat
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult

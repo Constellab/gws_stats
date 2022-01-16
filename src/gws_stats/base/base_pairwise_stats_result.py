@@ -4,14 +4,13 @@
 # About us: https://gencovery.com
 
 import numpy as np
-from gws_core import (ConfigParams, HeatmapView, ListParam, StrParam, Table,
-                      TableView, Task, TaskInputs, TaskOutputs,
-                      resource_decorator, task_decorator, view)
+from gws_core import (BoxPlotView, ConfigParams, HeatmapView, ListParam,
+                      StrParam, Table, TabularView, Task, TaskInputs,
+                      TaskOutputs, resource_decorator, task_decorator, view)
 from pandas import DataFrame, concat
 from scipy.stats import f_oneway
 
 from ..base.base_resource import BaseResource
-from ..view.stats_boxplot_view import StatsBoxPlotView
 
 
 @resource_decorator("BasePairwiseStatsResult", hide=True)
@@ -60,51 +59,45 @@ class BasePairwiseStatsResult(BaseResource):
             for j in range(i, cdata.shape[0]):
                 cdata.iloc[j, i] = np.nan
 
-        print(cdata)
-        return Table(cdata)
+        return cdata
 
-    @view(view_type=TableView, default_view=True, human_name="StatisticsTable",
-          short_description="Table of statistic and p-value")
-    def view_statistics_table(self, params: ConfigParams) -> TableView:
+    @view(view_type=TabularView, default_view=True, human_name="StatisticsTable",
+          short_description="Table of statistic and p-value", specs={})
+    def view_statistics_table(self, params: ConfigParams) -> TabularView:
         """
         View statistics table
         """
 
-        stats_data = self.get_result()
-        table = Table(stats_data)
-        return TableView(table)
+        data = self.get_result()
+        t_view = TabularView()
+        t_view.set_data(data=data)
+        return t_view
 
-    @view(view_type=TableView, default_view=True, human_name="ContingencyTable",
+    @view(view_type=TabularView, default_view=True, human_name="ContingencyTable",
           short_description="The contingency table of P-Values",
           specs={
               "metric": StrParam(
                   human_name="metric",
                   allowed_values=["p-value", "statistic"],
                   default_value="p-value")})
-    def view_contingency_table(self, params: ConfigParams) -> TableView:
+    def view_contingency_table(self, params: ConfigParams) -> TabularView:
         """
         View contingency table
         """
 
-        table = self._compute_contingency_table(params)
-        return TableView(table)
+        data = self._compute_contingency_table(params)
+        t_view = TabularView()
+        t_view.set_data(data=data)
+        return t_view
 
     @view(view_type=HeatmapView, default_view=True, human_name="ContingencyMap",
-          short_description="The contingency table of P-Values as HeatMap")
-    def view_contingency_map(self, params: ConfigParams) -> TableView:
+          short_description="The contingency table of P-Values as HeatMap", specs={})
+    def view_contingency_map(self, params: ConfigParams) -> HeatmapView:
         """
         View contingency map
         """
 
-        table = self._compute_contingency_table(params)
-        return TableView(table)
-
-    @ view(view_type=StatsBoxPlotView, human_name="StatBoxplot",
-           short_description="Boxplot of data with statistics and p-value")
-    def view_stats_result_as_boxplot(self, params: ConfigParams) -> StatsBoxPlotView:
-        """
-        View boxplots
-        """
-
-        stats_data = self.get_result()
-        return StatsBoxPlotView(self.table, stats=stats_data)
+        data = self._compute_contingency_table(params)
+        t_view = HeatmapView()
+        t_view.set_data(data=data)
+        return t_view

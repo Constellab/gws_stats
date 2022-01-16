@@ -51,15 +51,5 @@ class TestTrainer(BaseTestCase):
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")
 
-        # ---------------------------------------------------------------------
-        # run views
-        tester = ViewTester(
-            view=anova_result.view_stats_result_as_boxplot(
-                ConfigParams()
-            )
-        )
-        dic = tester.to_dict()
-        self.assertEqual(dic["type"], "box-plot-view")
-
         print(table)
         print(anova_result.get_result())

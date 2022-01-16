@@ -38,13 +38,5 @@ class TestTrainer(BaseTestCase):
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")
 
-        tester = ViewTester(
-            view=ttest2sample_ind_result.view_stats_result_as_boxplot(
-                ConfigParams()
-            )
-        )
-        dic = tester.to_dict()
-        self.assertEqual(dic["type"], "box-plot-view")
-
         print(table)
         print(ttest2sample_ind_result.get_result())

@@ -41,13 +41,5 @@ class TestTrainer(BaseTestCase):
         dic = tester.to_dict()
         self.assertEqual(dic["type"], "table-view")
 
-        tester = ViewTester(
-            view=mannwhitney_result.view_stats_result_as_boxplot(
-                ConfigParams()
-            )
-        )
-        dic = tester.to_dict()
-        self.assertEqual(dic["type"], "box-plot-view")
-
         print(table)
         print(mannwhitney_result.get_result())

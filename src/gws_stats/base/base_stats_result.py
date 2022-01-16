@@ -4,7 +4,7 @@
 # About us: https://gencovery.com
 
 
-from gws_core import ConfigParams, Table, TableView, resource_decorator, view
+from gws_core import ConfigParams, Table, TabularView, resource_decorator, view
 from pandas import DataFrame
 
 from .base_resource import BaseResource
@@ -25,13 +25,14 @@ class BaseStatsResult(BaseResource):
         data = DataFrame([stat_result], columns=columns)
         return data
 
-    @view(view_type=TableView, default_view=True, human_name="StatisticsTable",
-          short_description="Table of statistic and p-value")
+    @view(view_type=TabularView, default_view=True, human_name="StatisticsTable",
+          short_description="Table of statistic and p-value", specs={})
     def view_statistics_table(self, params: ConfigParams) -> dict:
         """
         View stats Table
         """
 
         stat_result = self.get_result()
-        table = Table(stat_result)
-        return TableView(table)
+        t_view = TabularView()
+        t_view.set_data(data=stat_result)
+        return t_view
