@@ -1,7 +1,7 @@
 {
     "name"          : "gws_stats",
     "author_email"  : "admin@gencovery.com",
-    "version"       : "0.1.0",
+    "version"       : "0.2.0",
     "description"   : "Gencovery brick for basic statistical analysis",
     "variables": {
         "gws_stats:testdata_dir": "${CURRENT_DIR}/tests/testdata"
@@ -21,7 +21,7 @@
             {
                 "source": "https://$GWS_GIT_LOGIN:$GWS_GIT_PWD@gitlab.com/gencovery/core",
                 "packages":[
-                    {"name": "gws_core", "commit": "latest", "branch": "", "is_brick": true}
+                    {"name": "gws_core", "version": "0.2.1", "commit": "", "branch": "", "is_brick": true}
                 ]
             }
         ],
