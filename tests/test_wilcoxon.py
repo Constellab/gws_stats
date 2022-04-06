@@ -7,10 +7,9 @@ from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
 from gws_stats import Wilcoxon
 
 
-class TestTrainer(BaseTestCase):
+class TestWicoxon(BaseTestCase):
 
     async def test_process(self):
-        self.print("Wicoxon T Test")
         settings = Settings.retrieve()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
@@ -30,16 +29,6 @@ class TestTrainer(BaseTestCase):
         )
         outputs = await tester.run()
         wilcoxon_result = outputs['result']
-
-        # ---------------------------------------------------------------------
-        # run views
-        tester = ViewTester(
-            view=wilcoxon_result.view_statistics_table(
-                ConfigParams()
-            )
-        )
-        dic = tester.to_dict()
-        self.assertEqual(dic["type"], "table-view")
 
         print(table)
         print(wilcoxon_result.get_result())

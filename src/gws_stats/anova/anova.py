@@ -83,5 +83,5 @@ class OneWayAnova(Task):
         stat_result = f_oneway(*data)
         stat_result = [stat_result.statistic, stat_result.pvalue]
         stat_result = np.array(stat_result)
-        result = OneWayAnovaResult(result=stat_result, table=table)
+        result = OneWayAnovaResult(result=stat_result, input_table=table)
         return {'result': result}

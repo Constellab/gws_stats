@@ -5,10 +5,9 @@ from gws_core import (BaseTestCase, ConfigParams, File, Settings, Table,
 from gws_stats import KruskalWallis
 
 
-class TestTrainer(BaseTestCase):
+class TestKruskalWallis(BaseTestCase):
 
     async def test_process(self):
-        self.print("KruskalWallis Test")
         settings = Settings.retrieve()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
@@ -28,14 +27,6 @@ class TestTrainer(BaseTestCase):
         )
         outputs = await tester.run()
         kruskwal_result = outputs['result']
-
-        # ---------------------------------------------------------------------
-        # run views
-        tester = ViewTester(
-            view=kruskwal_result.view_statistics_table(ConfigParams())
-        )
-        dic = tester.to_dict()
-        self.assertEqual(dic["type"], "table-view")
 
         print(table)
         print(kruskwal_result.get_result())

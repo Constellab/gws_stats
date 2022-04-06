@@ -56,7 +56,7 @@ class TTestOneSample(BasePairwiseStatsTask):
         exp_val = params.get_value("expected_value")
         alternative = params.get_value("alternative_hypothesis")
         stat_result = ttest_1samp(*current_data, popmean=exp_val, alternative=alternative, nan_policy='omit')
-        stat_result = ["ExpectedValue", target_col, stat_result.statistic, stat_result.pvalue]
+        stat_result = [f"ExpectedValue = {exp_val}", target_col, stat_result.statistic, stat_result.pvalue]
         stat_result = np.array(stat_result)
         return stat_result
 
@@ -96,5 +96,5 @@ class TTestOneSample(BasePairwiseStatsTask):
                 all_result = np.vstack((all_result, stat_result))
 
         t = self.output_specs["result"]
-        result = t(result=all_result, table=table)
+        result = t(result=all_result, input_table=table)
         return {'result': result}

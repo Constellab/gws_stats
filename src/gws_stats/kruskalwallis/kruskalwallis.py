@@ -79,5 +79,5 @@ class KruskalWallis(Task):
 
         stat_result = [stat_result.statistic, stat_result.pvalue]
         stat_result = np.array(stat_result)
-        result = KruskalWallisResult(result=stat_result, table=table)
+        result = KruskalWallisResult(result=stat_result, input_table=table)
         return {'result': result}

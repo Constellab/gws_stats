@@ -5,10 +5,9 @@ from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
 from gws_stats import PairwiseKruskalWallis
 
 
-class TestTrainer(BaseTestCase):
+class TestPairwiseKruskalWallis(BaseTestCase):
 
     async def test_process(self):
-        self.print("PairwiseKruskalWallis Test")
         settings = Settings.retrieve()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
@@ -28,26 +27,6 @@ class TestTrainer(BaseTestCase):
         )
         outputs = await tester.run()
         pairwise_kruskwal_result = outputs['result']
-
-        # ---------------------------------------------------------------------
-        # run views
-        tester = ViewTester(
-            view=pairwise_kruskwal_result.view_statistics_table(
-                ConfigParams()
-            )
-        )
-        dic = tester.to_dict()
-        self.assertEqual(dic["type"], "table-view")
-
-        tester = ViewTester(
-            view=pairwise_kruskwal_result.view_contingency_table(
-                ConfigParams({
-                    "metric": "p-value"
-                })
-            )
-        )
-        dic = tester.to_dict()
-        self.assertEqual(dic["type"], "table-view")
 
         print(table)
         print(pairwise_kruskwal_result.get_result())

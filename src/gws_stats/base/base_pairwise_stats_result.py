@@ -21,22 +21,39 @@ class BasePairwiseStatsResult(BaseResource):
     REFERENCE_NAME = "Reference"
     COMPARED_NAME = "Compared"
 
-    def get_result(self) -> DataFrame:
-        stat_result = super().get_result()
-        cls = type(self)
+    STATISTIC_TABLE_NAME = "Statistics table"
+    PVALUE_CONTINGENCY_TABLE_NAME = "Contingency table - PValue"
+    STATISTICS_CONTINGENCY_TABLE_NAME = "Contingency table - Statistics"
+
+    def __init__(self, result=None, input_table: Table = None):
+        super().__init__(result=result, input_table=input_table)
+        if result is not None:
+            self._create_statistics_table()
+            self._create_contingency_table("p-value")
+            self._create_contingency_table("statictic")
+
+    def get_statistics_table(self) -> DataFrame:
+        if self.resource_exists(self.STATISTIC_TABLE_NAME):
+            return self.get_resource(self.STATISTIC_TABLE_NAME)
+        else:
+            return None
+
+    def _create_statistics_table(self) -> DataFrame:
+        stat_result = self.get_result()
         columns = [
-            cls.REFERENCE_NAME,
-            cls.COMPARED_NAME,
-            cls.STATISTICS_NAME,
-            cls.PVALUE_NAME
+            self.REFERENCE_NAME,
+            self.COMPARED_NAME,
+            self.STATISTICS_NAME,
+            self.PVALUE_NAME
         ]
-
         data = DataFrame(stat_result, columns=columns)
-        return data
+        table = Table(data=data)
+        table.name = self.STATISTIC_TABLE_NAME
+        self.add_resource(table)
 
-    def _compute_contingency_table(self, params: ConfigParams):
-        stats_data = self.get_result()
-        metric = params.get_value("metric")
+    def _create_contingency_table(self, metric):
+        stats_data = self.get_statistics_table().get_data()
+        #metric = params.get_value("metric")
         cls = type(self)
         columns = [
             *stats_data.loc[:, cls.REFERENCE_NAME].values.tolist(),
@@ -59,45 +76,57 @@ class BasePairwiseStatsResult(BaseResource):
             for j in range(i, cdata.shape[0]):
                 cdata.iloc[j, i] = np.nan
 
-        return cdata
+        table = Table(cdata)
+        if metric == "p-value":
+            table.name = self.PVALUE_CONTINGENCY_TABLE_NAME
+        else:
+            table.name = self.STATISTICS_CONTINGENCY_TABLE_NAME
+        self.add_resource(table)
 
-    @view(view_type=TabularView, default_view=True, human_name="Statistics table",
-          short_description="Table of statistic and p-value", specs={})
-    def view_statistics_table(self, params: ConfigParams) -> TabularView:
-        """
-        View statistics table
-        """
+    def get_contingency_table(self, metric):
+        if metric == "p-value":
+            name = self.PVALUE_CONTINGENCY_TABLE_NAME
+        else:
+            name = self.STATISTICS_CONTINGENCY_TABLE_NAME
+        return self.get_resouce(name)
 
-        data = self.get_result()
-        t_view = TabularView()
-        t_view.set_data(data=data)
-        return t_view
+    # @view(view_type=TabularView, default_view=True, human_name="Statistics table",
+    #       short_description="Table of statistic and p-value", specs={})
+    # def view_statistics_table(self, params: ConfigParams) -> TabularView:
+    #     """
+    #     View statistics table
+    #     """
 
-    @view(view_type=TabularView, default_view=True, human_name="Contingency table",
-          short_description="The contingency table of P-Values",
-          specs={
-              "metric": StrParam(
-                  human_name="metric",
-                  allowed_values=["p-value", "statistic"],
-                  default_value="p-value")})
-    def view_contingency_table(self, params: ConfigParams) -> TabularView:
-        """
-        View contingency table
-        """
+    #     data = self.get_result()
+    #     t_view = TabularView()
+    #     t_view.set_data(data=data)
+    #     return t_view
 
-        data = self._compute_contingency_table(params)
-        t_view = TabularView()
-        t_view.set_data(data=data)
-        return t_view
+    # @view(view_type=TabularView, default_view=True, human_name="Contingency table",
+    #       short_description="The contingency table of P-Values",
+    #       specs={
+    #           "metric": StrParam(
+    #               human_name="metric",
+    #               allowed_values=["p-value", "statistic"],
+    #               default_value="p-value")})
+    # def view_contingency_table(self, params: ConfigParams) -> TabularView:
+    #     """
+    #     View contingency table
+    #     """
 
-    @view(view_type=HeatmapView, default_view=True, human_name="Contingency map",
-          short_description="The contingency table of P-Values as HeatMap", specs={})
-    def view_contingency_map(self, params: ConfigParams) -> HeatmapView:
-        """
-        View contingency map
-        """
+    #     data = self._create_contingency_table(params)
+    #     t_view = TabularView()
+    #     t_view.set_data(data=data)
+    #     return t_view
 
-        data = self._compute_contingency_table(params)
-        t_view = HeatmapView()
-        t_view.set_data(data=data)
-        return t_view
+    # @view(view_type=HeatmapView, default_view=True, human_name="Contingency map",
+    #       short_description="The contingency table of P-Values as HeatMap", specs={})
+    # def view_contingency_map(self, params: ConfigParams) -> HeatmapView:
+    #     """
+    #     View contingency map
+    #     """
+
+    #     data = self._create_contingency_table(params)
+    #     t_view = HeatmapView()
+    #     t_view.set_data(data=data)
+    #     return t_view

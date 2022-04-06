@@ -83,5 +83,5 @@ class BasePairwiseStatsTask(Task):
                     all_result = np.vstack((all_result, stat_result))
 
         t = self.output_specs["result"]
-        result = t(result=all_result, table=table)
+        result = t(result=all_result, input_table=table)
         return {'result': result}

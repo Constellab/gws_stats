@@ -7,10 +7,9 @@ from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
 from gws_stats import TTestOneSample
 
 
-class TestTrainer(BaseTestCase):
+class TestTTestOneSample(BaseTestCase):
 
     async def test_process(self):
-        self.print("T Test One Sample")
         settings = Settings.retrieve()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
@@ -30,16 +29,6 @@ class TestTrainer(BaseTestCase):
         )
         outputs = await tester.run()
         ttest1samp_result = outputs['result']
-
-        # ---------------------------------------------------------------------
-        # run views
-        tester = ViewTester(
-            view=ttest1samp_result.view_statistics_table(
-                ConfigParams()
-            )
-        )
-        dic = tester.to_dict()
-        self.assertEqual(dic["type"], "table-view")
 
         print(table)
         print(ttest1samp_result.get_result())

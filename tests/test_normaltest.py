@@ -4,10 +4,10 @@ import os
 import numpy
 from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
                       TableImporter, TaskRunner, ViewTester)
-from gws_stats import TTestTwoRelatedSamples
+from gws_stats import NormalTest
 
 
-class TestTTestTwoPairedSamples(BaseTestCase):
+class TestNormalTest(BaseTestCase):
 
     async def test_process(self):
         settings = Settings.retrieve()
@@ -25,10 +25,10 @@ class TestTTestTwoPairedSamples(BaseTestCase):
         tester = TaskRunner(
             params={},
             inputs={'table': table},
-            task_type=TTestTwoRelatedSamples
+            task_type=NormalTest
         )
         outputs = await tester.run()
-        ttest2sample_rel_result = outputs['result']
+        normaltest_result = outputs['result']
 
         print(table)
-        print(ttest2sample_rel_result.get_result())
+        print(normaltest_result)

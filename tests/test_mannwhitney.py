@@ -5,10 +5,9 @@ from gws_core import (BaseTestCase, ConfigParams, File, Settings,
 from gws_stats import MannWhitney
 
 
-class TestTrainer(BaseTestCase):
+class TestMannWhitney(BaseTestCase):
 
     async def test_process(self):
-        self.print("MannWhitney U Test")
         settings = Settings.retrieve()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
@@ -28,18 +27,6 @@ class TestTrainer(BaseTestCase):
         )
         outputs = await tester.run()
         mannwhitney_result = outputs['result']
-
-        # ---------------------------------------------------------------------
-        # run views
-        tester = ViewTester(
-            view=mannwhitney_result.view_statistics_table(
-                ConfigParams({
-                    "metric": "p-value"
-                })
-            )
-        )
-        dic = tester.to_dict()
-        self.assertEqual(dic["type"], "table-view")
 
         print(table)
         print(mannwhitney_result.get_result())
