@@ -4,6 +4,7 @@
 # About us: https://gencovery.com
 
 import numpy as np
+import pandas
 from gws_core import (ConfigParams, FloatParam, ListParam, StrParam, Table,
                       TaskInputs, TaskOutputs, resource_decorator,
                       task_decorator)
@@ -63,6 +64,7 @@ class TTestOneSample(BasePairwiseStatsTask):
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs['table']
         data = table.get_data()
+        data = data.apply(pandas.to_numeric, errors='coerce')
 
         target_cols = params.get_value("column_names")
         if target_cols:

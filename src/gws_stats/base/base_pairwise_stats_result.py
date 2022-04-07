@@ -7,8 +7,7 @@ import numpy as np
 from gws_core import (BoxPlotView, ConfigParams, HeatmapView, ListParam,
                       StrParam, Table, TabularView, Task, TaskInputs,
                       TaskOutputs, resource_decorator, task_decorator, view)
-from pandas import DataFrame, concat
-from scipy.stats import f_oneway
+from pandas import DataFrame
 
 from ..base.base_resource import BaseResource
 

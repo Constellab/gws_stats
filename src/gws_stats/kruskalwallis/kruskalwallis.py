@@ -4,6 +4,7 @@
 # About us: https://gencovery.com
 
 import numpy as np
+import pandas
 from gws_core import (ConfigParams, ListParam, Table, Task, TaskInputs,
                       TaskOutputs, resource_decorator, task_decorator)
 from scipy.stats import kruskal
@@ -64,6 +65,7 @@ class KruskalWallis(Task):
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs['table']
         data = table.get_data()
+        data = data.apply(pandas.to_numeric, errors='coerce')
 
         column_names = params.get_value("column_names", [])
         if not column_names:

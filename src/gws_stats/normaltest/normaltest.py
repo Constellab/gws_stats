@@ -3,7 +3,6 @@
 # The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
 # About us: https://gencovery.com
 
-import numpy as np
 import pandas
 from gws_core import (ConfigParams, ListParam, ResourceSet, StrParam, Table,
                       Task, TaskInputs, TaskOutputs, resource_decorator,
@@ -54,6 +53,8 @@ class NormalTest(Task):
 
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         data = inputs["table"].get_data()
+        data = data.apply(pandas.to_numeric, errors='coerce')
+
         column_names = params.get_value("column_names", [])
         if not column_names:
             column_names = data.columns[0:self.DEFAULT_NB_COLUMNS]

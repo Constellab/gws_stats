@@ -4,9 +4,9 @@
 # About us: https://gencovery.com
 
 import numpy as np
+import pandas
 from gws_core import (ConfigParams, ListParam, Table, Task, TaskInputs,
                       TaskOutputs, resource_decorator, task_decorator, view)
-from pandas import DataFrame
 from scipy.stats import f_oneway
 
 from ..base.base_stats_result import BaseStatsResult
@@ -66,6 +66,8 @@ class OneWayAnova(Task):
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs['table']
         data = table.get_data()
+        data = data.apply(pandas.to_numeric, errors='coerce')
+
         column_names = params.get_value("column_names", [])
         if not column_names:
             self.log_info_message("No column names given. The first 3 columns are used.")

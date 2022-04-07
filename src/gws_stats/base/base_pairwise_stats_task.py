@@ -6,6 +6,7 @@
 from abc import abstractmethod
 
 import numpy as np
+import pandas
 from gws_core import (ConfigParams, HeatmapView, ListParam, StrParam, Table,
                       Task, TaskInputs, TaskOutputs, resource_decorator,
                       task_decorator, view)
@@ -38,6 +39,7 @@ class BasePairwiseStatsTask(Task):
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs['table']
         data = table.get_data()
+        data = data.apply(pandas.to_numeric, errors='coerce')
 
         target_cols = params.get_value("column_names")
         if target_cols:
