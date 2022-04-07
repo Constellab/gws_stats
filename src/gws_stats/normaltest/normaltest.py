@@ -17,7 +17,7 @@ from scipy.stats import normaltest
 # *****************************************************************************
 
 
-@resource_decorator("NormalTestResultTable", hide=True)
+@resource_decorator("NormalTestResultTable", human_name="Normality test result", hide=True)
 class NormalTestResultTable(Table):
     pass
 
@@ -28,7 +28,8 @@ class NormalTestResultTable(Table):
 # *****************************************************************************
 
 
-@task_decorator("NormalTest")
+@task_decorator("NormalTest", human_name="Normality test",
+                short_description="Test that the distribution of a sample is normal")
 class NormalTest(Task):
 
     DEFAULT_NB_COLUMNS = 3

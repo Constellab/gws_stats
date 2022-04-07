@@ -18,7 +18,8 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 # *****************************************************************************
 
 
-@resource_decorator("TTestTwoIndepSamplesResult", hide=True)
+@resource_decorator("TTestTwoIndepSamplesResult", human_name="T-test two indep. samples result",
+                    short_description="Result of independent samples Student test (T-Test)", hide=True)
 class TTestTwoIndepSamplesResult(BasePairwiseStatsResult):
     STATISTICS_NAME = "T-Statistic"
 
@@ -29,7 +30,8 @@ class TTestTwoIndepSamplesResult(BasePairwiseStatsResult):
 # *****************************************************************************
 
 
-@task_decorator("TTestTwoIndepSamples")
+@task_decorator("TTestTwoIndepSamples", human_name="T-test two indep. samples result",
+                short_description="Test that the means of two independent samples are equal")
 class TTestTwoIndepSamples(BasePairwiseStatsTask):
     """
     Compute the T-test for the means of independent samples, from a given reference sample.

@@ -20,7 +20,8 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 # *****************************************************************************
 
 
-@resource_decorator("TTestOneSampleResult", hide=True)
+@resource_decorator("TTestOneSampleResult", human_name="T-test one sample result",
+                    short_description="Result of the one-sample Student test (T-Test)", hide=True)
 class TTestOneSampleResult(BasePairwiseStatsResult):
     STATISTICS_NAME = "T-Statistic"
 
@@ -31,7 +32,8 @@ class TTestOneSampleResult(BasePairwiseStatsResult):
 # *****************************************************************************
 
 
-@task_decorator("TTestOneSample")
+@task_decorator("TTestOneSample", human_name="T-test one sample",
+                short_description="Test that the mean of a sample is equal to a given value")
 class TTestOneSample(BasePairwiseStatsTask):
     """
     T test pour la moyenne d'un échantillon

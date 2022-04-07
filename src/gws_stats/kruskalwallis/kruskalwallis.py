@@ -18,7 +18,8 @@ from ..base.base_stats_result import BaseStatsResult
 # *****************************************************************************
 
 
-@resource_decorator("KruskalWallisResult", hide=True)
+@resource_decorator("KruskalWallisResult", human_name="Population Kruskal-Wallis result",
+                    short_description="Result of multiple Kruskal-Wallis H-test", hide=True)
 class KruskalWallisResult(BaseStatsResult):
     pass
 
@@ -29,7 +30,8 @@ class KruskalWallisResult(BaseStatsResult):
 # *****************************************************************************
 
 
-@task_decorator("KruskalWallis")
+@task_decorator("KruskalWallis", human_name="Population Kruskal-Wallis",
+                short_description="Test that two or more groups have the same population median")
 class KruskalWallis(Task):
     """
     Compute the Kruskal-Wallis H-test for independent samples.

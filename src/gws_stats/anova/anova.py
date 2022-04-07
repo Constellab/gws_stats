@@ -18,7 +18,8 @@ from ..base.base_stats_result import BaseStatsResult
 # *****************************************************************************
 
 
-@resource_decorator("OneWayAnovaResult", hide=True)
+@resource_decorator("OneWayAnovaResult", human_name="Multiple one-way ANOVA result",
+                    short_description="Result of one-way ANOVA test for multiple samples", hide=True)
 class OneWayAnovaResult(BaseStatsResult):
     pass
 
@@ -29,7 +30,8 @@ class OneWayAnovaResult(BaseStatsResult):
 # *****************************************************************************
 
 
-@task_decorator("OneWayAnova")
+@task_decorator("OneWayAnova", human_name="Multiple one-way ANOVA",
+                short_description="Test that two or more groups have the same population mean")
 class OneWayAnova(Task):
     """
     Compute the one-way ANOVA test for multiple samples.

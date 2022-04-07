@@ -18,7 +18,8 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 # *****************************************************************************
 
 
-@resource_decorator("TTestTwoRelatedSamplesResult", hide=True)
+@resource_decorator("TTestTwoRelatedSamplesResult", human_name="T-test two rel. samples result",
+                    short_description="Result of related samples Student test(T-Test)", hide=True)
 class TTestTwoRelatedSamplesResult(BasePairwiseStatsResult):
     STATISTICS_NAME = "T-Statistic"
 
@@ -29,12 +30,13 @@ class TTestTwoRelatedSamplesResult(BasePairwiseStatsResult):
 # *****************************************************************************
 
 
-@task_decorator("TTestTwoRelatedSamples")
+@ task_decorator("TTestTwoRelatedSamples", human_name="T-test two rel. samples",
+                 short_description="Test that the means of two related samples are equal")
 class TTestTwoRelatedSamples(BasePairwiseStatsTask):
     """
     Compute the T-test for the means of related samples, from a given reference sample.
 
-    This test is a two-sided (or one-side) test for the null hypothesis that 2 independent samples have identical average (expected) values.
+    This test is a two-sided (or one-side) test for the null hypothesis that 2 related samples have identical average (expected) values.
 
     * Input: a table containing the sample measurements, with the name of the samples.
 

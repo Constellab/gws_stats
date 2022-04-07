@@ -17,7 +17,8 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 # *****************************************************************************
 
 
-@resource_decorator("PairwiseKruskalWallisResult", hide=True)
+@resource_decorator("PairwiseKruskalWallisResult", human_name="Pairwise Kruskal-Wallis result",
+                    short_description="Result of pairwise Kruskal-Wallis H-test", hide=True)
 class PairwiseKruskalWallisResult(BasePairwiseStatsResult):
     STATISTICS_NAME = "H-Statistic"
 
@@ -28,7 +29,8 @@ class PairwiseKruskalWallisResult(BasePairwiseStatsResult):
 # *****************************************************************************
 
 
-@task_decorator("PairwiseKruskalWallis")
+@task_decorator("PairwiseKruskalWallis", human_name="Pairwise Kruskal-Wallis",
+                short_description="Test that two groups have the same population median")
 class PairwiseKruskalWallis(BasePairwiseStatsTask):
     """
     Compute the Kruskal-Wallis H-test for pairwise independent samples, from a given reference sample.
@@ -58,7 +60,7 @@ class PairwiseKruskalWallis(BasePairwiseStatsTask):
         **BasePairwiseStatsTask.config_specs
     }
     _remove_nan_before_compute = False
-    
+
     def compute_stats(self, current_data, ref_col, target_col, params: ConfigParams):
         stat_result = kruskal(*current_data, nan_policy='omit')
         stat_result = [ref_col, target_col, stat_result.statistic, stat_result.pvalue]

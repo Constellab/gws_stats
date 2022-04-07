@@ -15,7 +15,8 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 # ==============================================================================
 
 
-@resource_decorator("WilcoxonResult", hide=True)
+@resource_decorator("WilcoxonResult", human_name="Wilcoxon test result",
+                    short_description="Result of Wilcoxon test", hide=True)
 class WilcoxonResult(BasePairwiseStatsResult):
     STATISTICS_NAME = "T-Statistic"
 
@@ -23,7 +24,8 @@ class WilcoxonResult(BasePairwiseStatsResult):
 # ==============================================================================
 
 
-@task_decorator("Wilcoxon")
+@task_decorator("Wilcoxon", human_name="Wilcoxon test",
+                short_description="Test that two related paired samples come from the same distribution")
 class Wilcoxon(BasePairwiseStatsTask):
     """
     Calculate the Wilcoxon signed-rank test of paired samples, from a given reference sample.

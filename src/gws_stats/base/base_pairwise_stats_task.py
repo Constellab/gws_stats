@@ -15,7 +15,7 @@ from pandas import concat
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
 
 
-@ task_decorator("BasePairwiseStatsTask")
+@ task_decorator("BasePairwiseStatsTask", hide=True)
 class BasePairwiseStatsTask(Task):
     """
     BasePairwiseStatsTask

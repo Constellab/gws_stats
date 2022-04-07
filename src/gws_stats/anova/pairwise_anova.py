@@ -17,7 +17,7 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 # *****************************************************************************
 
 
-@resource_decorator("PairwiseOneWayAnovaResult", hide=True)
+@resource_decorator("PairwiseOneWayAnovaResult", human_name="Result of pairwise one-way ANOVA", hide=True)
 class PairwiseOneWayAnovaResult(BasePairwiseStatsResult):
     STATISTICS_NAME = "F-Statistic"
 
@@ -28,7 +28,8 @@ class PairwiseOneWayAnovaResult(BasePairwiseStatsResult):
 # *****************************************************************************
 
 
-@ task_decorator("PairwiseOneWayAnova")
+@task_decorator("PairwiseOneWayAnova", human_name="Pairwise one-way ANOVA",
+                short_description="Test that two groups have the same population mean")
 class PairwiseOneWayAnova(BasePairwiseStatsTask):
     """
     Compute the one-way ANOVA test for pairwise samples, from a given reference sample.

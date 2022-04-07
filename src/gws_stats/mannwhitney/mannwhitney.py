@@ -18,7 +18,8 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 # *****************************************************************************
 
 
-@resource_decorator("MannWhitneyResult", hide=True)
+@resource_decorator("MannWhitneyResult", human_name="Mann Whitney result",
+                    short_description="Result of pairwise Mann Whitney U-rank test", hide=True)
 class MannWhitneyResult(BasePairwiseStatsResult):
     STATISTICS_NAME = "U-Statistic"
 
@@ -29,7 +30,8 @@ class MannWhitneyResult(BasePairwiseStatsResult):
 # *****************************************************************************
 
 
-@task_decorator("MannWhitney")
+@task_decorator("MannWhitney", human_name="Mann Whitney",
+                short_description="Test that the distributions of two samples are the same")
 class MannWhitney(BasePairwiseStatsTask):
     """
     Mann Whitney U rank test on pairwise independent samples, from a given sample reference.
