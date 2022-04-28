@@ -56,6 +56,9 @@ class KruskalWallis(Task):
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kruskal.html
     """
+
+    DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE = 99
+
     input_specs = {'table': Table}
     output_specs = {'result': KruskalWallisResult}
     config_specs = {
@@ -71,7 +74,7 @@ class KruskalWallis(Task):
 
         column_names = params.get_value("column_names", [])
         if not column_names:
-            column_names = data.columns[0:3]
+            column_names = data.columns[0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]
 
         data = data[column_names].to_numpy().T
         array_sum = np.sum(data)

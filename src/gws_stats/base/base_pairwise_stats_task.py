@@ -21,6 +21,8 @@ class BasePairwiseStatsTask(Task):
     BasePairwiseStatsTask
     """
 
+    DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE = 99
+
     input_specs = {'table': Table}
     output_specs = {'result': BasePairwiseStatsResult}
     config_specs = {
@@ -46,8 +48,7 @@ class BasePairwiseStatsTask(Task):
             data = data.loc[:, target_cols]
         else:
             self.log_info_message("No column names given. The first 3 columns are used.")
-            n = min(3, data.shape[1])
-            data = data.iloc[:, 0:n]
+            data = data.iloc[:, 0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]
 
         is_nan_log_shown = False
         all_result = None

@@ -57,6 +57,8 @@ class OneWayAnova(Task):
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.f_oneway.html
     """
 
+    DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE = 99
+
     input_specs = {'table': Table}
     output_specs = {'result': OneWayAnovaResult}
     config_specs = {
@@ -73,7 +75,7 @@ class OneWayAnova(Task):
         column_names = params.get_value("column_names", [])
         if not column_names:
             self.log_info_message("No column names given. The first 3 columns are used.")
-            column_names = data.columns[0:3]
+            column_names = data.columns[0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]
 
         data = data[column_names].to_numpy().T
         array_sum = np.sum(data)

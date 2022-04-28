@@ -32,7 +32,7 @@ class NormalTestResultTable(Table):
                 short_description="Test that the distribution of a sample is normal")
 class NormalTest(Task):
 
-    DEFAULT_NB_COLUMNS = 3
+    DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE = 3
 
     """
     Test whether a sample differs from a normal distribution.
@@ -49,7 +49,7 @@ class NormalTest(Task):
         "column_names":
         ListParam(
             default_value=None, optional=True, human_name="Columns names",
-            short_description=f"The names of the columns to test. By default the first {DEFAULT_NB_COLUMNS} columns are used.")
+            short_description=f"The names of the columns to test. By default the first {DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used.")
     }
 
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
@@ -58,7 +58,7 @@ class NormalTest(Task):
 
         column_names = params.get_value("column_names", [])
         if not column_names:
-            column_names = data.columns[0:self.DEFAULT_NB_COLUMNS]
+            column_names = data.columns[0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]
         data = data[column_names]
 
         k2, pval = normaltest(data.to_numpy(), nan_policy='omit')
