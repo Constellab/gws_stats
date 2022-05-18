@@ -6,7 +6,7 @@
 import numpy as np
 import pandas
 from gws_core import (ConfigParams, ListParam, Table, Task, TaskInputs,
-                      TaskOutputs, resource_decorator, task_decorator)
+                      TaskOutputs, resource_decorator, task_decorator, InputSpec, OutputSpec)
 from scipy.stats import kruskal
 
 from ..base.base_stats_result import BaseStatsResult
@@ -59,8 +59,8 @@ class KruskalWallis(Task):
 
     DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE = 99
 
-    input_specs = {'table': Table}
-    output_specs = {'result': KruskalWallisResult}
+    input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
+    output_specs = {'result': OutputSpec(KruskalWallisResult, human_name="Result", short_description="The output result")}
     config_specs = {
         "column_names": ListParam(
             default_value=[], human_name="Column names",

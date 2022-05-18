@@ -6,7 +6,7 @@
 import pandas
 from gws_core import (ConfigParams, ListParam, ResourceSet, StrParam, Table,
                       Task, TaskInputs, TaskOutputs, resource_decorator,
-                      task_decorator)
+                      task_decorator, InputSpec, OutputSpec)
 from pandas import DataFrame
 from scipy.stats import normaltest
 
@@ -43,8 +43,8 @@ class NormalTest(Task):
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.normaltest.html
     """
-    input_specs = {'table': Table}
-    output_specs = {'result': NormalTestResultTable}
+    input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
+    output_specs = {'result': OutputSpec(NormalTestResultTable, human_name="Result", short_description="The output result")}
     config_specs = {
         "column_names":
         ListParam(

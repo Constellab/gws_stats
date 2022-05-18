@@ -9,7 +9,7 @@ import numpy as np
 import pandas
 from gws_core import (ConfigParams, HeatmapView, ListParam, StrParam, Table,
                       Task, TaskInputs, TaskOutputs, resource_decorator,
-                      task_decorator, view)
+                      task_decorator, view, InputSpec, OutputSpec)
 from pandas import concat
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -22,9 +22,8 @@ class BasePairwiseStatsTask(Task):
     """
 
     DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE = 99
-
-    input_specs = {'table': Table}
-    output_specs = {'result': BasePairwiseStatsResult}
+    input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
+    output_specs = {'result': OutputSpec(BasePairwiseStatsResult, human_name="Result", short_description="The output result")}
     config_specs = {
         "column_names":
         ListParam(
@@ -85,6 +84,6 @@ class BasePairwiseStatsTask(Task):
                 else:
                     all_result = np.vstack((all_result, stat_result))
 
-        t = self.output_specs["result"]
+        t = self.output_specs["result"].get_default_resource_type()
         result = t(result=all_result, input_table=table)
         return {'result': result}
