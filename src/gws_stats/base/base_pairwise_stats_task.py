@@ -37,6 +37,9 @@ class BasePairwiseStatsTask(Task):
     def compute_stats(self, current_data, ref_col, target_col, params: ConfigParams):
         return None
 
+    def remove_nan(data):
+        pass
+
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs['table']
         data = table.get_data()

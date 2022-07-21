@@ -16,4 +16,5 @@ from .ttests.ttest2sample_rel import TTestTwoRelatedSamples
 # wilcoxon
 from .wilcoxon.wilcoxon import Wilcoxon
 # correlation
-from .correlation.correlation import PairwiseCorrelationCoef
+from .correlation.pearson import PearsonCorrelation
+from .correlation.spearman import SpearmanCorrelation

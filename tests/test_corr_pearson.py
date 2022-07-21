@@ -2,7 +2,7 @@ import os
 
 from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
                       TableImporter, TaskRunner, ViewTester)
-from gws_stats import PairwiseCorrelationCoef
+from gws_stats import PearsonCorrelation
 
 
 class TestPairwiseCorrelationCoef(BaseTestCase):
@@ -21,12 +21,12 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
         # ---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params={'method': 'pearson'},
+            params={'column_names': None},
             inputs={'table': table},
-            task_type=PairwiseCorrelationCoef
+            task_type=PearsonCorrelation
         )
         outputs = await tester.run()
         pairwise_correlationcoef_result = outputs['result']
 
         print(table)
-        print(pairwise_correlationcoef_result.get_result())
+        print(pairwise_correlationcoef_result.get_statistics_table())
