@@ -6,14 +6,14 @@
 import numpy as np
 from gws_core import (ConfigParams, Table, resource_decorator, task_decorator, InputSpec, 
                         OutputSpec, StrParam, ConfigParams, TaskInputs, TaskOutputs)
-from scipy.stats import (spearmanr, pearsonr)
+from scipy.stats import spearmanr
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
 from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 
 # *****************************************************************************
 #
-# PairwiseCorrelationCoefResult
+# SpearmanCorrelationResult
 #
 # *****************************************************************************
 
@@ -24,7 +24,7 @@ class SpearmanCorrelationResult(BasePairwiseStatsResult):
 
 # *****************************************************************************
 #
-# PairwiseCorrelationCoef
+# SpearmanCorrelation
 #
 # *****************************************************************************
 
@@ -33,12 +33,11 @@ class SpearmanCorrelationResult(BasePairwiseStatsResult):
                 short_description="Compute Spearman correlation coefficients between two groups with p-value")
 class SpearmanCorrelation(BasePairwiseStatsTask):
     """
-    Compute the correlation Spearman coefficient for pairwise samples, with its p-value.
+    Compute the Spearman correlation coefficient for pairwise samples, with its p-value.
     
     The Spearman rank-order correlation coefficient is a nonparametric measure of the monotonicity of the relationship 
     between two datasets. Unlike the Pearson correlation, the Spearman correlation does not assume that both datasets are 
     normally distributed. The p-value returned is a two-sided p-value.
-    
     Like other correlation coefficients, these ones vary between -1 and +1 with 0 implying no correlation. Correlations of -1 
     or +1 imply an exact linear relationship. Positive correlations imply that as x increases, so does y. Negative correlations 
     imply that as x increases, y decreases.
@@ -47,7 +46,6 @@ class SpearmanCorrelation(BasePairwiseStatsTask):
     * Output: a table listing the correlation coefficient, and its associated p-value for each pairwise comparison testing.
     * Config Parameters:
     - "column_names": The columns used for pairwise comparison. By default, the first three columns are used.
-    - "method": the method chosen for the computation of the correlation coefficient (either "pearson" or "spearman")
 
     For more details on the Spearman correlation coefficient, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.spearmanr.htm.
     """
