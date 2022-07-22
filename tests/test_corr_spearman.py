@@ -21,7 +21,7 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
         # ---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params={'column_names': None},
+            params={'column_names': None, 'reference_column': None},
             inputs={'table': table},
             task_type=SpearmanCorrelation
         )

@@ -30,3 +30,17 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
 
         print(table)
         print(pairwise_correlationcoef_result.get_statistics_table())
+
+
+        # ---------------------------------------------------------------------
+        # run statistical test with reference_column
+        tester = TaskRunner(
+            params={'reference_column': None, 'column_names': None},
+            inputs={'table': table},
+            task_type=PearsonCorrelation
+        )
+        outputs = await tester.run()
+        pairwise_correlationcoef_result = outputs['result']
+
+        print(table)
+        print(pairwise_correlationcoef_result.get_statistics_table())

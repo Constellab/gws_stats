@@ -9,7 +9,7 @@ import numpy as np
 import pandas
 from gws_core import (ConfigParams, HeatmapView, ListParam, StrParam, Table,
                       Task, TaskInputs, TaskOutputs, resource_decorator,
-                      task_decorator, view, InputSpec, OutputSpec)
+                      task_decorator, view, InputSpec, OutputSpec, BadRequestException)
 from pandas import concat
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -28,7 +28,11 @@ class BasePairwiseStatsTask(Task):
         "column_names":
         ListParam(
             default_value=None, optional=True, human_name="Columns names",
-            short_description="The columns used for pairwise comparison. By default, the first three columns are used")
+            short_description=f"The columns used for pairwise comparison. By default, the first {DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used"),
+        "reference_column":
+        StrParam(
+            default_value=None, optional=True, human_name="Reference column",
+            short_description=f"The columns used as reference for pairwise comparison. Only this column is compared with the others.")
     }
 
     _remove_nan_before_compute = True
@@ -49,17 +53,31 @@ class BasePairwiseStatsTask(Task):
         if target_cols:
             data = data.loc[:, target_cols]
         else:
-            self.log_info_message("No column names given. The first 3 columns are used.")
+            self.log_info_message(f"No column names given. The first {self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used.")
             data = data.iloc[:, 0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]
+
+        reference_column = params.get_value("reference_column")
+        if reference_column:
+            if reference_column in data.columns:
+                k = data.columns.get_loc(reference_column)
+                ref_col_indexes = [ k ]
+            else:
+                raise BadRequestException(f"The reference column {reference_column} name is not found")
+        else:
+            ref_col_indexes = range(0, data.shape[1])
 
         is_nan_log_shown = False
         all_result = None
 
-        for i in range(0, data.shape[1]):
+        for i in ref_col_indexes:
             ref_col = data.columns[i]
             ref_data = data.iloc[:, [i]]
 
-            for j in range(i, data.shape[1]):
+            for j in range(0, data.shape[1]):
+                if not reference_column:
+                    if j <= i:
+                        continue
+
                 target_col = data.columns[j]
                 if target_col == ref_col:
                     continue
