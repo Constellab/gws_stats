@@ -30,12 +30,11 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
 
         print(table)
         print(pairwise_correlationcoef_result.get_statistics_table())
-
-
+        print(pairwise_correlationcoef_result.get_contingency_table(metric="p-value"))
         # ---------------------------------------------------------------------
         # run statistical test with reference_column
         tester = TaskRunner(
-            params={'reference_column': None, 'column_names': None},
+            params={'reference_column': 'T1', 'column_names': None},
             inputs={'table': table},
             task_type=PearsonCorrelation
         )
@@ -44,3 +43,4 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
 
         print(table)
         print(pairwise_correlationcoef_result.get_statistics_table())
+        print(pairwise_correlationcoef_result.get_contingency_table(metric="p-value"))

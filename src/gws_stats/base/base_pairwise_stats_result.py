@@ -52,14 +52,15 @@ class BasePairwiseStatsResult(BaseResource):
 
     def _create_contingency_table(self, metric):
         stats_data = self.get_statistics_table().get_data()
-        #metric = params.get_value("metric")
+        # metric = params.get_value("metric")
         cls = type(self)
         columns = [
             *stats_data.loc[:, cls.REFERENCE_NAME].values.tolist(),
             *stats_data.loc[:, cls.COMPARED_NAME].values.tolist()
         ]
-        columns = list(set(columns))
+        columns = sorted(list(set(columns)))
         n = len(columns)
+
         cdata = DataFrame(np.ones([n, n]), columns=columns, index=columns)
         for i in range(0, stats_data.shape[0]):
             col1 = stats_data.loc[i, cls.REFERENCE_NAME]
@@ -75,7 +76,13 @@ class BasePairwiseStatsResult(BaseResource):
             for j in range(i, cdata.shape[0]):
                 cdata.iloc[j, i] = np.nan
 
+        # remove
+        ref_columns = sorted(list(set(stats_data.loc[:, cls.REFERENCE_NAME].values.tolist())))
+        comp_columns = sorted(list(set(stats_data.loc[:, cls.COMPARED_NAME].values.tolist())))
+        cdata = cdata.loc[ref_columns, comp_columns]
+
         table = Table(cdata)
+
         if metric == "p-value":
             table.name = self.PVALUE_CONTINGENCY_TABLE_NAME
         else:
@@ -83,8 +90,9 @@ class BasePairwiseStatsResult(BaseResource):
         self.add_resource(table)
 
     def get_contingency_table(self, metric):
+        """ Get the contingency table """
         if metric == "p-value":
             name = self.PVALUE_CONTINGENCY_TABLE_NAME
         else:
             name = self.STATISTICS_CONTINGENCY_TABLE_NAME
-        return self.get_resouce(name)
+        return self.get_resource(name)

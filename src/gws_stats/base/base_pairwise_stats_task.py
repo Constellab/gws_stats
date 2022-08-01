@@ -7,9 +7,10 @@ from abc import abstractmethod
 
 import numpy as np
 import pandas
-from gws_core import (ConfigParams, HeatmapView, ListParam, StrParam, Table,
-                      Task, TaskInputs, TaskOutputs, resource_decorator,
-                      task_decorator, view, InputSpec, OutputSpec, BadRequestException)
+from gws_core import (BadRequestException, ConfigParams, HeatmapView,
+                      InputSpec, ListParam, OutputSpec, StrParam, Table, Task,
+                      TaskInputs, TaskOutputs, resource_decorator,
+                      task_decorator, view)
 from pandas import concat
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -23,16 +24,17 @@ class BasePairwiseStatsTask(Task):
 
     DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE = 99
     input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
-    output_specs = {'result': OutputSpec(BasePairwiseStatsResult, human_name="Result", short_description="The output result")}
+    output_specs = {'result': OutputSpec(BasePairwiseStatsResult, human_name="Result",
+                                         short_description="The output result")}
     config_specs = {
-        "column_names":
-        ListParam(
-            default_value=None, optional=True, human_name="Columns names",
-            short_description=f"The columns used for pairwise comparison. By default, the first {DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used"),
         "reference_column":
         StrParam(
             default_value=None, optional=True, human_name="Reference column",
-            short_description=f"The columns used as reference for pairwise comparison. Only this column is compared with the others.")
+            short_description="The columns used as reference for pairwise comparison. Only this column is compared with the others."),
+        "column_names":
+        ListParam(
+            default_value=None, optional=True, human_name="Selected columns names",
+            short_description=f"The columns selected for pairwise comparison. By default, the first {DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used"),
     }
 
     _remove_nan_before_compute = True
@@ -49,38 +51,43 @@ class BasePairwiseStatsTask(Task):
         data = table.get_data()
         data = data.apply(pandas.to_numeric, errors='coerce')
 
-        target_cols = params.get_value("column_names")
-        if target_cols:
-            data = data.loc[:, target_cols]
-        else:
-            self.log_info_message(f"No column names given. The first {self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used.")
-            data = data.iloc[:, 0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]
-
         reference_column = params.get_value("reference_column")
+        selected_cols = params.get_value("column_names")
+
         if reference_column:
             if reference_column in data.columns:
-                k = data.columns.get_loc(reference_column)
-                ref_col_indexes = [ k ]
+                reference_columns = [ reference_column ]
             else:
                 raise BadRequestException(f"The reference column {reference_column} name is not found")
         else:
-            ref_col_indexes = range(0, data.shape[1])
+            reference_columns = list(set(data.columns[0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]))
+
+        if selected_cols:
+            selected_cols = list(set([*selected_cols, *reference_columns]))
+        else:
+            self.log_info_message(
+                f"No column names given. The first {self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used.")
+            selected_cols = data.columns[0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]
+            selected_cols = list(set([*selected_cols, *reference_columns]))
+
+        data = data.loc[:, selected_cols]
 
         is_nan_log_shown = False
         all_result = None
 
-        for i in ref_col_indexes:
-            ref_col = data.columns[i]
+        for ref_col in data.columns:
+            if ref_col not in reference_columns:
+                continue
+            i = data.columns.get_loc(ref_col)
             ref_data = data.iloc[:, [i]]
 
-            for j in range(0, data.shape[1]):
+            for target_col in data.columns:
+                j = data.columns.get_loc(target_col)
                 if not reference_column:
                     if j <= i:
                         continue
-
-                target_col = data.columns[j]
-                if target_col == ref_col:
-                    continue
+                # if target_col == ref_col:
+                #     continue
 
                 target_data = data.iloc[:, [j]]
                 current_data = concat(
