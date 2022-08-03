@@ -5,9 +5,9 @@
 
 import numpy as np
 import pandas
-from gws_core import (ConfigParams, FloatParam, ListParam, StrParam, Table,
-                      TaskInputs, TaskOutputs, resource_decorator,
-                      task_decorator, InputSpec, OutputSpec)
+from gws_core import (ConfigParams, FloatParam, InputSpec, ListParam,
+                      OutputSpec, StrParam, Table, TaskInputs, TaskOutputs,
+                      resource_decorator, task_decorator)
 from scipy.stats import ttest_1samp
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -41,7 +41,8 @@ class TTestOneSample(BasePairwiseStatsTask):
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html
     """
     input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
-    output_specs = {'result': OutputSpec(TTestOneSampleResult, human_name="Result", short_description="The output result")}
+    output_specs = {'result': OutputSpec(TTestOneSampleResult, human_name="Result",
+                                         short_description="The output result")}
     config_specs = {
         "column_names": ListParam(
             default_value=[], human_name="Column names",
@@ -56,11 +57,11 @@ class TTestOneSample(BasePairwiseStatsTask):
     _remove_nan_before_compute = False
 
     def compute_stats(self, current_data, target_col, params: ConfigParams):
+        """ compute stats """
         exp_val = params.get_value("expected_value")
         alternative = params.get_value("alternative_hypothesis")
         stat_result = ttest_1samp(*current_data, popmean=exp_val, alternative=alternative, nan_policy='omit')
         stat_result = [f"ExpectedValue = {exp_val}", target_col, stat_result.statistic, stat_result.pvalue]
-        stat_result = np.array(stat_result)
         return stat_result
 
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
@@ -94,9 +95,10 @@ class TTestOneSample(BasePairwiseStatsTask):
             stat_result = self.compute_stats(current_data, target_col, params)
 
             if all_result is None:
-                all_result = [stat_result]
+                all_result = pandas.DataFrame(stat_result).T
             else:
-                all_result = np.vstack((all_result, stat_result))
+                df = pandas.DataFrame(stat_result).T
+                all_result = pandas.concat([all_result, df], axis=0, ignore_index=True)
 
         t = self.output_specs["result"].get_default_resource_type()
         result = t(result=all_result, input_table=table)

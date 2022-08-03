@@ -4,7 +4,8 @@
 # About us: https://gencovery.com
 
 import numpy as np
-from gws_core import (ConfigParams, Table, resource_decorator, task_decorator, InputSpec, OutputSpec)
+from gws_core import (ConfigParams, InputSpec, OutputSpec, Table,
+                      resource_decorator, task_decorator)
 from scipy.stats import f_oneway
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -56,7 +57,8 @@ class PairwiseOneWayAnova(BasePairwiseStatsTask):
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.f_oneway.html
     """
     input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
-    output_specs = {'result': OutputSpec(PairwiseOneWayAnovaResult, human_name="Result", short_description="The output result")}
+    output_specs = {'result': OutputSpec(PairwiseOneWayAnovaResult, human_name="Result",
+                                         short_description="The output result")}
     config_specs = {
         **BasePairwiseStatsTask.config_specs
     }
@@ -64,5 +66,4 @@ class PairwiseOneWayAnova(BasePairwiseStatsTask):
     def compute_stats(self, current_data, ref_col, target_col, params: ConfigParams):
         stat_result = f_oneway(*current_data)
         stat_result = [ref_col, target_col, stat_result.statistic, stat_result.pvalue]
-        stat_result = np.array(stat_result)
         return stat_result

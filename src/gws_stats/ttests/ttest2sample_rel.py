@@ -4,8 +4,9 @@
 # About us: https://gencovery.com
 
 import numpy as np
-from gws_core import (BoolParam, ConfigParams, StrParam, Table,
-                      resource_decorator, task_decorator, InputSpec, OutputSpec)
+import pandas
+from gws_core import (BoolParam, ConfigParams, InputSpec, OutputSpec, StrParam,
+                      Table, resource_decorator, task_decorator)
 from scipy.stats import ttest_rel
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -48,7 +49,8 @@ class TTestTwoRelatedSamples(BasePairwiseStatsTask):
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_rel.html
     """
     input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
-    output_specs = {'result': OutputSpec(TTestTwoRelatedSamplesResult, human_name="Result", short_description="The output result")}
+    output_specs = {'result': OutputSpec(TTestTwoRelatedSamplesResult,
+                                         human_name="Result", short_description="The output result")}
     config_specs = {
         **BasePairwiseStatsTask.config_specs,
         "alternative_hypothesis": StrParam(default_value="two-sided",
@@ -62,5 +64,4 @@ class TTestTwoRelatedSamples(BasePairwiseStatsTask):
         alternative = params.get_value("alternative_hypothesis")
         stat_result = ttest_rel(*current_data, nan_policy='omit', alternative=alternative)
         stat_result = [ref_col, target_col, stat_result.statistic, stat_result.pvalue]
-        stat_result = np.array(stat_result)
         return stat_result

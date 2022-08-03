@@ -5,8 +5,9 @@
 
 import numpy as np
 import pandas
-from gws_core import (ConfigParams, ListParam, Table, Task, TaskInputs,
-                      TaskOutputs, resource_decorator, task_decorator, view, InputSpec, OutputSpec)
+from gws_core import (ConfigParams, InputSpec, ListParam, OutputSpec, Table,
+                      Task, TaskInputs, TaskOutputs, resource_decorator,
+                      task_decorator, view)
 from scipy.stats import f_oneway
 
 from ..base.base_stats_result import BaseStatsResult
@@ -88,6 +89,6 @@ class OneWayAnova(Task):
 
         stat_result = f_oneway(*data)
         stat_result = [stat_result.statistic, stat_result.pvalue]
-        stat_result = np.array(stat_result)
+        stat_result = pandas.DataFrame(stat_result).T
         result = OneWayAnovaResult(result=stat_result, input_table=table)
         return {'result': result}

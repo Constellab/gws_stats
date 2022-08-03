@@ -4,8 +4,9 @@
 # About us: https://gencovery.com
 
 import numpy as np
-from gws_core import (BoolParam, ConfigParams, StrParam, Table,
-                      resource_decorator, task_decorator, InputSpec, OutputSpec)
+import pandas
+from gws_core import (BoolParam, ConfigParams, InputSpec, OutputSpec, StrParam,
+                      Table, resource_decorator, task_decorator)
 from scipy.stats import ttest_ind
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -49,7 +50,8 @@ class TTestTwoIndepSamples(BasePairwiseStatsTask):
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html
     """
     input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
-    output_specs = {'result': OutputSpec(TTestTwoIndepSamplesResult, human_name="Result", short_description="The output result")}
+    output_specs = {'result': OutputSpec(TTestTwoIndepSamplesResult,
+                                         human_name="Result", short_description="The output result")}
     config_specs = {
         **BasePairwiseStatsTask.config_specs,
         'equal_variance':
@@ -68,5 +70,4 @@ class TTestTwoIndepSamples(BasePairwiseStatsTask):
         alternative = params.get_value("alternative_hypothesis")
         stat_result = ttest_ind(*current_data, nan_policy='omit', alternative=alternative, equal_var=equal_var)
         stat_result = [ref_col, target_col, stat_result.statistic, stat_result.pvalue]
-        stat_result = np.array(stat_result)
         return stat_result

@@ -56,7 +56,7 @@ class BasePairwiseStatsTask(Task):
 
         if reference_column:
             if reference_column in data.columns:
-                reference_columns = [ reference_column ]
+                reference_columns = [reference_column]
             else:
                 raise BadRequestException(f"The reference column {reference_column} name is not found")
         else:
@@ -108,9 +108,11 @@ class BasePairwiseStatsTask(Task):
                 stat_result = self.compute_stats(current_data, ref_col, target_col, params)
 
                 if all_result is None:
-                    all_result = [stat_result]
+                    all_result = pandas.DataFrame(stat_result).T
                 else:
-                    all_result = np.vstack((all_result, stat_result))
+                    df = pandas.DataFrame(stat_result).T
+                    # np.vstack((all_result, stat_result))
+                    all_result = pandas.concat([all_result, df], axis=0, ignore_index=True)
 
         t = self.output_specs["result"].get_default_resource_type()
         result = t(result=all_result, input_table=table)

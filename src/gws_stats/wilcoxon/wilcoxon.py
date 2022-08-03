@@ -4,8 +4,8 @@
 # About us: https://gencovery.com
 
 import numpy as np
-from gws_core import (BoolParam, ConfigParams, StrParam, Table,
-                      resource_decorator, task_decorator, InputSpec, OutputSpec)
+from gws_core import (BoolParam, ConfigParams, InputSpec, OutputSpec, StrParam,
+                      Table, resource_decorator, task_decorator)
 from scipy.stats import wilcoxon
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -80,5 +80,4 @@ class Wilcoxon(BasePairwiseStatsTask):
         alternative = params.get_value("alternative_hypothesis")
         stat_result = wilcoxon(*current_data, zero_method=zero_method, alternative=alternative, mode=mode)
         stat_result = [ref_col, target_col, stat_result.statistic, stat_result.pvalue]
-        stat_result = np.array(stat_result)
         return stat_result

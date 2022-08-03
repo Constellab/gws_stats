@@ -45,14 +45,12 @@ class BasePairwiseStatsResult(BaseResource):
             self.STATISTICS_NAME,
             self.PVALUE_NAME
         ]
-        data = DataFrame(stat_result, columns=columns)
-        table = Table(data=data)
+        table = Table(data=stat_result, column_names=columns)
         table.name = self.STATISTIC_TABLE_NAME
         self.add_resource(table)
 
     def _create_contingency_table(self, metric):
         stats_data = self.get_statistics_table().get_data()
-        # metric = params.get_value("metric")
         cls = type(self)
         columns = [
             *stats_data.loc[:, cls.REFERENCE_NAME].values.tolist(),

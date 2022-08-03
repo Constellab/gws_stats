@@ -4,8 +4,8 @@
 # About us: https://gencovery.com
 
 import numpy as np
-from gws_core import (ConfigParams, StrParam, Table, resource_decorator,
-                      task_decorator, InputSpec, OutputSpec)
+from gws_core import (ConfigParams, InputSpec, OutputSpec, StrParam, Table,
+                      resource_decorator, task_decorator)
 from scipy.stats import mannwhitneyu
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -77,5 +77,4 @@ class MannWhitney(BasePairwiseStatsTask):
         alternative = params.get_value("alternative_hypothesis")
         stat_result = mannwhitneyu(*current_data, method=method, alternative=alternative)
         stat_result = [ref_col, target_col, stat_result.statistic, stat_result.pvalue]
-        stat_result = np.array(stat_result)
         return stat_result

@@ -85,6 +85,6 @@ class KruskalWallis(Task):
         stat_result = kruskal(*data, nan_policy='omit')
 
         stat_result = [stat_result.statistic, stat_result.pvalue]
-        stat_result = np.array(stat_result)
+        stat_result = pandas.DataFrame(stat_result).T
         result = KruskalWallisResult(result=stat_result, input_table=table)
         return {'result': result}

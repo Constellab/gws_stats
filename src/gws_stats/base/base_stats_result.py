@@ -34,8 +34,7 @@ class BaseStatsResult(BaseResource):
             self.STATISTICS_NAME,
             self.PVALUE_NAME
         ]
-        data = DataFrame([stat_result], columns=columns)
-        table = Table(data=data)
+        table = Table(data=stat_result, column_names=columns)
         table.name = self.STATISTIC_TABLE_NAME
         self.add_resource(table)
 
