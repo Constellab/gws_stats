@@ -18,13 +18,13 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 @resource_decorator("WilcoxonResult", human_name="Wilcoxon test result",
                     short_description="Result of Wilcoxon test", hide=True)
 class WilcoxonResult(BasePairwiseStatsResult):
-    STATISTICS_NAME = "T-Statistic"
+    STATISTICS_NAME = "TStatistic"
 
 # ==============================================================================
 # ==============================================================================
 
 
-@task_decorator("Wilcoxon", human_name="Wilcoxon test",
+@task_decorator("Wilcoxon", human_name="Paired Wilcoxon test",
                 short_description="Test that two related paired samples come from the same distribution")
 class Wilcoxon(BasePairwiseStatsTask):
     """
@@ -35,17 +35,15 @@ class Wilcoxon(BasePairwiseStatsTask):
     It is a non-parametric version of the paired T-test.
 
     * Input: a table containing the sample measurements, with the name of the samples.
-
     * Output: a table listing the Wilcoxon T-statistic, and the p-value for each pairwise comparison testing.
-
     * Config Parameters:
-    - "reference_column": the name of the reference sample for pairwise comparison testing. Set it to empty to use the first column of the table of samples as reference.
-    - "zero_method": the method used to treat the zero differences. The following options are available (default is “wilcox”):
-            “pratt”: Includes zero-differences in the ranking process, but drops the ranks of the zeros, see [4], (more conservative).
-            “wilcox”: Discards all zero-differences, the default.
-            “zsplit”: Includes zero-differences in the ranking process and split the zero rank between positive and negative ones.
-    - "alternative_hypothesis": the alternative hypothesis to be tested (either "less, "greater", or "two_sided"). Default is “two-sided”.
-    - "mode":  the method to calculate the p-value (either ""auto", "exact", or "approx"). Default is "auto".
+      - `reference_column`: the name of the reference sample for pairwise comparison testing. Set it to empty to use the first column of the table of samples as reference.
+      - `zero_method`: the method used to treat the zero differences. The following options are available (default is “wilcox”):
+        - `pratt`: Includes zero-differences in the ranking process, but drops the ranks of the zeros, see [4], (more conservative).
+        - `wilcox`: Discards all zero-differences, the default.
+        - `zsplit`: Includes zero-differences in the ranking process and split the zero rank between positive and negative ones.
+      - `alternative_hypothesis`: the alternative hypothesis to be tested (either "less, "greater", or "two_sided"). Default is “two-sided”.
+      - `mode`:  the method to calculate the p-value (either ""auto", "exact", or "approx"). Default is "auto".
 
     Notes: one assumption of the test is that the differences are symmetric. The two-sided test has the null hypothesis that the median of the
     differences is zero against the alternative that it is different from zero. The one-sided test has the null hypothesis that the median is

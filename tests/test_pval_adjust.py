@@ -2,13 +2,12 @@ import os
 
 from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
                       TableImporter, TaskRunner, ViewTester)
-from gws_core.extra import DataProvider
-from gws_stats import PearsonCorrelation
+from gws_stats import PearsonCorrelation, PValueAdjust
 
 
-class TestPairwiseCorrelationCoef(BaseTestCase):
+class TestPValueAdjust(BaseTestCase):
 
-    async def test_pearson(self):
+    async def test_process(self):
         settings = Settings.retrieve()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
@@ -32,7 +31,6 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
         print(table)
         print(pairwise_correlationcoef_result.get_statistics_table())
         print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))
-
         # ---------------------------------------------------------------------
         # run statistical test with reference_column
         tester = TaskRunner(
@@ -43,26 +41,27 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
         outputs = await tester.run()
         pairwise_correlationcoef_result = outputs['result']
 
-        print(table)
+        stat_table = pairwise_correlationcoef_result.get_statistics_table()
         print(pairwise_correlationcoef_result.get_statistics_table())
-        print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))
 
-    async def test_pearson_with_group_comaprison(self):
-        settings = Settings.retrieve()
-        test_dir = settings.get_variable("gws_stats:testdata_dir")
-        table = DataProvider.get_iris_table()
-
-        print(table)
-
+        # ---------------------------------------------------------------------
+        # run correction test
         tester = TaskRunner(
-            params={'row_tag_key': 'variety',
-                    'preselected_column_names': [
-                        {'name': 'petal.*', 'is_regex': True},
-                        {'name': 'sepal.*', 'is_regex': True}]
-                    },
-            inputs={'table': table},
-            task_type=PearsonCorrelation)
+            params={},
+            inputs={'table': stat_table},
+            task_type=PValueAdjust
+        )
         outputs = await tester.run()
-        pairwise_correlationcoef_result = outputs['result']
-        print(pairwise_correlationcoef_result.get_statistics_table())
-        print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))
+        table = outputs['table']
+        print(table)
+
+        # ---------------------------------------------------------------------
+        # run correction test with pval column
+        tester = TaskRunner(
+            params={"pval_column_name": "PValue"},
+            inputs={'table': stat_table},
+            task_type=PValueAdjust
+        )
+        outputs = await tester.run()
+        table = outputs['table']
+        print(table)

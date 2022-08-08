@@ -22,7 +22,7 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 @resource_decorator("TTestTwoRelatedSamplesResult", human_name="T-test two rel. samples result",
                     short_description="Result of related samples Student test(T-Test)", hide=True)
 class TTestTwoRelatedSamplesResult(BasePairwiseStatsResult):
-    STATISTICS_NAME = "T-Statistic"
+    STATISTICS_NAME = "TStatistic"
 
 # *****************************************************************************
 #
@@ -40,11 +40,9 @@ class TTestTwoRelatedSamples(BasePairwiseStatsTask):
     This test is a two-sided (or one-side) test for the null hypothesis that 2 related samples have identical average (expected) values.
 
     * Input: a table containing the sample measurements, with the name of the samples.
-
     * Output: a table listing the T-statistic, and the p-value for each pairwise comparison testing.
-
     * Config Parameters:
-    - "column_names": The columns used for pairwise comparison. By default, the first three columns are used.
+      - "column_names": The columns used for pairwise comparison. By default, the first three columns are used.
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_rel.html
     """

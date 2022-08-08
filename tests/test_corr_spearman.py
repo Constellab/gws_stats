@@ -21,7 +21,7 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
         # ---------------------------------------------------------------------
         # run statistical test
         tester = TaskRunner(
-            params={'column_names': None, 'reference_column': None},
+            params={'preselected_column_names': None, 'reference_column': None},
             inputs={'table': table},
             task_type=SpearmanCorrelation
         )
@@ -30,3 +30,5 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
 
         print(table)
         print(pairwise_correlationcoef_result.get_statistics_table())
+        print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))
+        print(pairwise_correlationcoef_result.get_contingency_table(metric="adjusted_pvalue"))

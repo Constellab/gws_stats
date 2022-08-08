@@ -22,7 +22,7 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 @resource_decorator("TTestTwoIndepSamplesResult", human_name="T-test two indep. samples result",
                     short_description="Result of independent samples Student test (T-Test)", hide=True)
 class TTestTwoIndepSamplesResult(BasePairwiseStatsResult):
-    STATISTICS_NAME = "T-Statistic"
+    STATISTICS_NAME = "TStatistic"
 
 # *****************************************************************************
 #
@@ -40,12 +40,10 @@ class TTestTwoIndepSamples(BasePairwiseStatsTask):
     This test is a two-sided test for the null hypothesis that 2 independent samples have identical average (expected) values.
 
     * Input: a table containing the sample measurements, with the name of the samples.
-
     * Output: a table listing the T-statistic, and the p-value for each pairwise comparison testing.
-
     * Config Parameters:
-    - "column_names": The columns used for pairwise comparison. By default, the first three columns are used.
-    - "equal_variance": a boolean parameter setting whether populations have equal variance.
+      - "column_names": The columns used for pairwise comparison. By default, the first three columns are used.
+      - "equal_variance": a boolean parameter setting whether populations have equal variance.
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html
     """

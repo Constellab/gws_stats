@@ -72,7 +72,7 @@ class NormalTest(Task):
 
         result_data = pandas.concat([k2, pval, mean, std], axis=1, ignore_index=True).T
         result_data.columns = data.columns
-        result_data.index = ["Statistics (s^2+k^2)", "P-Value", "Mean", "Std"]
+        result_data.index = ["Statistics", "PValue", "Mean", "Std"]
 
         result = NormalTestResultTable(data=result_data)
         return {"result": result}

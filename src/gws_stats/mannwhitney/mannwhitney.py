@@ -40,16 +40,14 @@ class MannWhitney(BasePairwiseStatsTask):
     two samples are the same. It is often used to test whether two samples are likely to derive from the same population
 
     * Input: a table containing the sample measurements, with the name of the samples.
-
     * Output: a table listing the Mann-Whitney U statistic, and the associated p-value for each pairwise comparison testing.
-
     * Config Parameters:
-    - "column_names": The columns used for pairwise comparison. By default, the first three columns are used.
-    - "method": the method used to calculate the p-value (either "auto", "asymptotic", or "exact"). Default method is set to "auto".
-    - "alternative_hypothesis": the alternative hypothesis chosen for the testing (either "two-sided", "less", or "greater"). Default alternative hypothesis is set to "two-sided".
+      - `column_names`: The columns used for pairwise comparison. By default, the first three columns are used.
+      - `method`: the method used to calculate the p-value (either `auto`, `asymptotic`, or `exact`). Default method is set to `auto`.
+      - `alternative_hypothesis`: the alternative hypothesis chosen for the testing (either `two-sided`, `less`, or `greater`). Default alternative hypothesis is set to "two-sided".
 
-    Note: the "exact" method is recommended when there are no ties and when either sample size is less than 8.
-    The "exact" method is not corrected for ties, but no errors or warnings will be raised if there are ties in the data.
+    Note: the `exact` method is recommended when there are no ties and when either sample size is less than 8.
+    The `exact` method is not corrected for ties, but no errors or warnings will be raised if there are ties in the data.
     The Mann-Whitney U test is a non-parametric version of the t-test for independent samples. When the the means of samples
     from the populations are normally distributed, consider the t-test for independant samples.
     Note that the Mann-Whitney U statistic depends on the sample take as the first one for the computation of the statistic

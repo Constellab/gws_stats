@@ -6,8 +6,8 @@
 import numpy as np
 import pandas
 from gws_core import (ConfigParams, FloatParam, InputSpec, ListParam,
-                      OutputSpec, StrParam, Table, TaskInputs, TaskOutputs,
-                      resource_decorator, task_decorator)
+                      OutputSpec, ParamSet, StrParam, Table, TaskInputs,
+                      TaskOutputs, resource_decorator, task_decorator)
 from scipy.stats import ttest_1samp
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -23,7 +23,7 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 @resource_decorator("TTestOneSampleResult", human_name="T-test one sample result",
                     short_description="Result of the one-sample Student test (T-Test)", hide=True)
 class TTestOneSampleResult(BasePairwiseStatsResult):
-    STATISTICS_NAME = "T-Statistic"
+    STATISTICS_NAME = "TStatistic"
 
 # *****************************************************************************
 #
@@ -36,7 +36,9 @@ class TTestOneSampleResult(BasePairwiseStatsResult):
                 short_description="Test that the mean of a sample is equal to a given value")
 class TTestOneSample(BasePairwiseStatsTask):
     """
-    T test pour la moyenne d'un échantillon
+    Calculate the T-test for the mean of ONE group of scores
+
+    This is a test for the null hypothesis that the expected value (mean) of a sample of independent observations a is equal to the given population mean, popmean.
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html
     """
@@ -46,15 +48,24 @@ class TTestOneSample(BasePairwiseStatsTask):
     config_specs = {
         "column_names": ListParam(
             default_value=[], human_name="Column names",
-            short_description="The names of the columns to test against the expected value"),
+            short_description=f"The names of the columns to test against the expected value. By default, the first {BasePairwiseStatsTask.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used"),
         'expected_value': FloatParam(default_value=0.0, human_name="Expected value", short_description="The expected value in null hypothesis"),
         "alternative_hypothesis": StrParam(default_value="two-sided",
                                            allowed_values=["two-sided", "less", "greater"],
                                            human_name="Alternative hypothesis",
-                                           short_description="The alternative hypothesis chosen for the testing.")
+                                           short_description="The alternative hypothesis chosen for the testing."),
+        "adjust_pvalue":
+        ParamSet({
+            "method": StrParam(
+                default_value=BasePairwiseStatsTask.DEFAULT_ADJUST_METHOD, human_name="Correction method",
+                allowed_values=["bonferroni", "fdr_bh", "fdr_by", "fdr_tsbh", "fdr_tsbky",
+                                "sidak", "holm-sidak", "holm", "simes-hochberg", "hommel"],
+                short_description="The method used to adjust (correct) p-values", visibility=StrParam.PROTECTED_VISIBILITY),
+            "alpha": FloatParam(
+                default_value=BasePairwiseStatsTask.DEFAULT_ADJUST_ALPHA, min_value=0, max_value=1, human_name="Alpha",
+                short_description="FWER, family-wise error rate", visibility=FloatParam.PROTECTED_VISIBILITY)
+        }, human_name="Adjust p-values", short_description="Adjust p-values for multiple tests", max_number_of_occurrences=1, optional=True, visibility=ParamSet.PROTECTED_VISIBILITY)
     }
-
-    _remove_nan_before_compute = False
 
     def compute_stats(self, current_data, target_col, params: ConfigParams):
         """ compute stats """
@@ -73,7 +84,8 @@ class TTestOneSample(BasePairwiseStatsTask):
         if target_cols:
             data = data.loc[:, target_cols]
         else:
-            self.log_info_message("No column names given. The first 3 columns are used.")
+            self.log_info_message(
+                f"No column names given. The first {self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used.")
             data = data.iloc[:, 0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]
 
         is_nan_log_shown = False
@@ -95,10 +107,13 @@ class TTestOneSample(BasePairwiseStatsTask):
             stat_result = self.compute_stats(current_data, target_col, params)
 
             if all_result is None:
-                all_result = pandas.DataFrame(stat_result).T
+                all_result = pandas.DataFrame([stat_result])
             else:
-                df = pandas.DataFrame(stat_result).T
+                df = pandas.DataFrame([stat_result])
                 all_result = pandas.concat([all_result, df], axis=0, ignore_index=True)
+
+        # adjust pvalue
+        all_result = self._adjust_pvals(all_result, params)
 
         t = self.output_specs["result"].get_default_resource_type()
         result = t(result=all_result, input_table=table)

@@ -12,7 +12,7 @@ from .base_resource import BaseResource
 @resource_decorator("BaseStatsResult", hide=True)
 class BaseStatsResult(BaseResource):
 
-    PVALUE_NAME = "P-Value"
+    PVALUE_NAME = "PValue"
     STATISTICS_NAME = "Statistic"
 
     STATISTIC_TABLE_NAME = "Statistics table"
