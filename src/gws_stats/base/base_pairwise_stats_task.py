@@ -152,6 +152,9 @@ class BasePairwiseStatsTask(Task):
         if len(paraset) == 0:
             adjust_method = self.DEFAULT_ADJUST_METHOD
             adjust_alpha = self.DEFAULT_ADJUST_ALPHA
+        else:
+            adjust_method = paraset.get("method", self.DEFAULT_ADJUST_METHOD)
+            adjust_alpha = paraset.get("alpha", self.DEFAULT_ADJUST_ALPHA)
 
         _, pvals_corrected, _, _ = multipletests(
             all_result.iloc[:, 3].to_numpy().flatten(),
