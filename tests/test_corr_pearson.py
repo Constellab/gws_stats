@@ -30,7 +30,7 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
         pairwise_correlationcoef_result = outputs['result']
 
         print(table)
-        print(pairwise_correlationcoef_result.get_statistics_table())
+        print(pairwise_correlationcoef_result.get_full_statistics_table())
         print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))
 
         # ---------------------------------------------------------------------
@@ -44,16 +44,12 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
         pairwise_correlationcoef_result = outputs['result']
 
         print(table)
-        print(pairwise_correlationcoef_result.get_statistics_table())
+        print(pairwise_correlationcoef_result.get_full_statistics_table())
         print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))
 
-    async def test_pearson_with_group_comaprison(self):
-        settings = Settings.retrieve()
-        test_dir = settings.get_variable("gws_stats:testdata_dir")
+    async def test_pearson_with_group_comparison(self):
         table = DataProvider.get_iris_table()
-
         print(table)
-
         tester = TaskRunner(
             params={'row_tag_key': 'variety',
                     'preselected_column_names': [
@@ -64,5 +60,9 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
             task_type=PearsonCorrelation)
         outputs = await tester.run()
         pairwise_correlationcoef_result = outputs['result']
-        print(pairwise_correlationcoef_result.get_statistics_table())
+        print(pairwise_correlationcoef_result.get_full_statistics_table())
         print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))
+
+        tables = pairwise_correlationcoef_result.get_group_statistics_table()
+        print(tables)
+        self.assertEqual(len(tables), 3)

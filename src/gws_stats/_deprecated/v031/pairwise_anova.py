@@ -8,8 +8,8 @@ from gws_core import (ConfigParams, InputSpec, OutputSpec, Table,
                       resource_decorator, task_decorator)
 from scipy.stats import f_oneway
 
-from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
-from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
+from ...base.base_pairwise_stats_result import BasePairwiseStatsResult
+from ...base.base_pairwise_stats_task import BasePairwiseStatsTask
 
 # *****************************************************************************
 #
@@ -18,7 +18,8 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 # *****************************************************************************
 
 
-@resource_decorator("PairwiseOneWayAnovaResult", human_name="Result of pairwise one-way ANOVA", hide=True)
+@resource_decorator("PairwiseOneWayAnovaResult", human_name="Result of pairwise one-way ANOVA",
+                    hide=True, deprecated_since='0.3.1', deprecated_message="This resource is deprecated")
 class PairwiseOneWayAnovaResult(BasePairwiseStatsResult):
     STATISTICS_NAME = "F-Statistic"
 
@@ -30,7 +31,8 @@ class PairwiseOneWayAnovaResult(BasePairwiseStatsResult):
 
 
 @task_decorator("PairwiseOneWayAnova", human_name="Pairwise one-way ANOVA",
-                short_description="Test that two groups have the same population mean")
+                short_description="Test that two groups have the same population mean",
+                hide=True, deprecated_since='0.3.1', deprecated_message="This task is deprecated")
 class PairwiseOneWayAnova(BasePairwiseStatsTask):
     """
     Compute the one-way ANOVA test for pairwise samples, from a given reference sample.

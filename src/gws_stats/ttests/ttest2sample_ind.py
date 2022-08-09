@@ -19,7 +19,7 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 # *****************************************************************************
 
 
-@resource_decorator("TTestTwoIndepSamplesResult", human_name="T-test two indep. samples result",
+@resource_decorator("TTestTwoIndepSamplesResult", human_name="T-test with indep. samples result",
                     short_description="Result of independent samples Student test (T-Test)", hide=True)
 class TTestTwoIndepSamplesResult(BasePairwiseStatsResult):
     STATISTICS_NAME = "TStatistic"
@@ -31,14 +31,15 @@ class TTestTwoIndepSamplesResult(BasePairwiseStatsResult):
 # *****************************************************************************
 
 
-@task_decorator("TTestTwoIndepSamples", human_name="T-test two indep. samples result",
-                short_description="Test that the means of two independent samples are equal")
+@task_decorator("TTestTwoIndepSamples", human_name="T-test with indep. samples result",
+                short_description="Test that the means of two independent samples are equal. Performs pairwise analysis for more than two samples.")
 class TTestTwoIndepSamples(BasePairwiseStatsTask):
     """
     Compute the T-test for the means of independent samples, from a given reference sample.
 
     This test is a two-sided test for the null hypothesis that 2 independent samples have identical average (expected) values.
-
+    Performs pairwise analysis for more than two samples.
+    
     * Input: a table containing the sample measurements, with the name of the samples.
     * Output: a table listing the T-statistic, and the p-value for each pairwise comparison testing.
     * Config Parameters:

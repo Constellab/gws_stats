@@ -8,9 +8,9 @@ from abc import abstractmethod
 import numpy as np
 import pandas
 from gws_core import (BadRequestException, BoolParam, ConfigParams, FloatParam,
-                      HeatmapView, InputSpec, ListParam, OutputSpec, ParamSet,
-                      StrParam, Table, TableUnfolderHelper, Task, TaskInputs,
-                      TaskOutputs, resource_decorator, task_decorator, view)
+                      InputSpec, ListParam, OutputSpec, ParamSet, StrParam,
+                      Table, TableUnfolderHelper, Task, TaskInputs,
+                      TaskOutputs, task_decorator)
 from pandas import concat
 from statsmodels.stats.multitest import multipletests
 
@@ -128,25 +128,25 @@ class BasePairwiseStatsTask(Task):
         table = inputs['table']
         reference_column = params.get_value("reference_column")
         row_tag_key = params.get_value("row_tag_key")
-
+        is_group_comparison = False
         if reference_column:
             all_result = self._column_wise_compare(table, params)
         elif row_tag_key:
             all_result = self._row_group_compare(table, params)
+            is_group_comparison = True
         else:
             all_result = self._column_wise_compare(table, params)
 
         if all_result is None:
             raise BadRequestException("The final result table seems empty. Please check pre-selected column names.")
-
         # adjust pvalue
-        all_result = self._adjust_pvals(all_result, params)
+        all_result_dict = self._adjust_pvals(all_result, is_group_comparison, params)
 
         t = self.output_specs["result"].get_default_resource_type()
-        result = t(result=all_result, input_table=table)
+        result = t(result=all_result_dict, input_table=table)
         return {'result': result}
 
-    def _adjust_pvals(self, all_result, params):
+    def _adjust_pvals(self, all_result, is_group_comparison, params):
         # adjust pvalue
         paraset = params.get_value("adjust_pvalue")
         if len(paraset) == 0:
@@ -156,23 +156,46 @@ class BasePairwiseStatsTask(Task):
             adjust_method = paraset[0].get("method", self.DEFAULT_ADJUST_METHOD)
             adjust_alpha = paraset[0].get("alpha", self.DEFAULT_ADJUST_ALPHA)
 
-        _, pvals_corrected, _, _ = multipletests(
-            all_result.iloc[:, 3].to_numpy().flatten(),
-            adjust_alpha, adjust_method)
-        pvals_corrected = pandas.DataFrame(pvals_corrected)
-        pvals_corrected.index = all_result.index
-        all_result = pandas.concat([all_result, pvals_corrected], axis=1, ignore_index=True)
+        all_result_dict = {}
+        if is_group_comparison:
+            comparison_list = [
+                *all_result.iloc[:, 0].to_list(),
+                *all_result.iloc[:, 1].to_list()
+            ]
+            groups = list(set([name.split("_")[-1] for name in comparison_list]))
+            for i, grp1 in enumerate(groups):
+                for j, grp2 in enumerate(groups):
+                    if j <= i:
+                        continue
+                    all_result_grp = self._select_comparisons_by_groups(all_result, grp1, grp2)
+                    all_result_grp = self._do_adjust_pvals(all_result_grp, adjust_method, adjust_alpha)
+                    all_result_dict[f"{grp1}_{grp2}"] = all_result_grp
 
-        return all_result
+            all_result_dict["full"] = pandas.concat(all_result_dict.values(), axis=0, ignore_index=True)
+        else:
+            all_result_dict["full"] = self._do_adjust_pvals(all_result, adjust_method, adjust_alpha)
+
+        return all_result_dict
+
+    def _select_comparisons_by_groups(self, all_result, grp1, grp2):
+        col1 = all_result.iloc[:, 0]
+        col2 = all_result.iloc[:, 1]
+        cond1 = (col1.str.endswith(f"_{grp1}")) & (col2.str.endswith(f"_{grp2}"))
+        cond2 = (col1.str.endswith(f"_{grp2}")) & (col2.str.endswith(f"_{grp1}"))
+        all_result_grp = all_result[cond1 | cond2]
+        return all_result_grp
 
     def _column_wise_compare(self, table, params):
-
         selected_cols = params.get_value("preselected_column_names")
         reference_column = params.get_value("reference_column")
         if selected_cols:
             if reference_column:
                 if reference_column in table.column_names:
-                    selected_cols.append(reference_column)
+                    filter_ = {
+                        "name": reference_column,
+                        "is_regex": False
+                    }
+                    selected_cols.append(filter_)
             table = table.select_by_column_names(selected_cols)
 
         if table.nb_columns <= 1:
@@ -183,7 +206,6 @@ class BasePairwiseStatsTask(Task):
         data = data.apply(pandas.to_numeric, errors='coerce')
         reference_column = params.get_value("reference_column")
         selected_cols = params.get_value("preselected_column_names")
-
         if reference_column:
             if reference_column in data.columns:
                 reference_columns = [reference_column]
@@ -192,53 +214,44 @@ class BasePairwiseStatsTask(Task):
         else:
             reference_columns = list(set(table.column_names[0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]))
 
-        # if selected_cols:
-        #     selected_cols = list(set([*selected_cols, *reference_columns]))
-        # else:
-        #     self.log_info_message(
-        #         f"No column names given. The first {self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used.")
-        #     selected_cols = data.columns[0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]
-        #     selected_cols = list(set([*selected_cols, *reference_columns]))
-        # data = data.loc[:, selected_cols]
-
-        all_result = self._compare_columns(data, params, reference_columns)
-
+        all_result = self._do_comparisons(data, params, reference_columns)
         return all_result
 
     def _row_group_compare(self, table, params):
-
         selected_cols = params.get_value("preselected_column_names")
         if selected_cols:
             table = table.select_by_column_names(selected_cols)
-
         if table.nb_columns == 0:
             raise BadRequestException("The pre-selected table is empty. Please check pre-selected column name.")
 
         key = params.get_value("row_tag_key")
-
         data = table.get_data()
         data = data.apply(pandas.to_numeric, errors='coerce')
-
         all_result = None
         for k in range(0, data.shape[1]):
             # select each column separately to compare them
             sub_table = table.select_by_column_positions([k])
-
             # unfold the current column
             sub_table = TableUnfolderHelper.unfold_rows_by_tags(sub_table, [key], 'column_name')
-
-            # compare all the unfloded columns
+            # compare all the unfolded columns
             reference_columns = list(set(sub_table.column_names[0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]))
-
             if all_result is None:
-                all_result = self._compare_columns(sub_table.get_data(), params, reference_columns)
+                all_result = self._do_comparisons(sub_table.get_data(), params, reference_columns)
             else:
-                df = self._compare_columns(sub_table.get_data(), params, reference_columns)
+                df = self._do_comparisons(sub_table.get_data(), params, reference_columns)
                 all_result = pandas.concat([all_result, df], axis=0, ignore_index=True)
 
         return all_result
 
-    def _compare_columns(self, data, params, reference_columns=None):
+    def _do_adjust_pvals(self, data, adjust_method, adjust_alpha):
+        _, pvals_corrected, _, _ = multipletests(
+            data.iloc[:, 3].to_numpy().flatten(),
+            adjust_alpha, adjust_method)
+        pvals_corrected = pandas.DataFrame(pvals_corrected)
+        pvals_corrected.index = data.index
+        return pandas.concat([data, pvals_corrected], axis=1, ignore_index=True)
+
+    def _do_comparisons(self, data, params, reference_columns=None):
         all_result = None
         is_nan_log_shown = False
         if reference_columns is None:
@@ -256,14 +269,13 @@ class BasePairwiseStatsTask(Task):
                 if not reference_column:
                     if j <= i:
                         continue
-
                 target_data = data.iloc[:, [j]]
                 current_data = concat(
                     [ref_data, target_data],
                     axis=1
                 )
+                current_data = current_data.apply(pandas.to_numeric, errors='coerce')
                 current_data = current_data.to_numpy().T
-
                 array_sum = np.sum(current_data)
                 array_has_nan = np.isnan(array_sum)
                 if array_has_nan:
@@ -274,7 +286,6 @@ class BasePairwiseStatsTask(Task):
                         is_nan_log_shown = True
 
                 stat_result = self.compute_stats(current_data, ref_col, target_col, params)
-
                 if all_result is None:
                     all_result = pandas.DataFrame([stat_result])
                 else:

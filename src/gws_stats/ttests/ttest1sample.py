@@ -5,9 +5,10 @@
 
 import numpy as np
 import pandas
-from gws_core import (ConfigParams, FloatParam, InputSpec, ListParam,
-                      OutputSpec, ParamSet, StrParam, Table, TaskInputs,
-                      TaskOutputs, resource_decorator, task_decorator)
+from gws_core import (BoolParam, ConfigParams, FloatParam, InputSpec,
+                      ListParam, OutputSpec, ParamSet, StrParam, Table,
+                      TaskInputs, TaskOutputs, resource_decorator,
+                      task_decorator)
 from scipy.stats import ttest_1samp
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -46,9 +47,18 @@ class TTestOneSample(BasePairwiseStatsTask):
     output_specs = {'result': OutputSpec(TTestOneSampleResult, human_name="Result",
                                          short_description="The output result")}
     config_specs = {
-        "column_names": ListParam(
-            default_value=[], human_name="Column names",
-            short_description=f"The names of the columns to test against the expected value. By default, the first {BasePairwiseStatsTask.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used"),
+        "preselected_column_names":
+        ParamSet({
+            "name": StrParam(
+                default_value="", human_name="Pre-selected columns names", optional=True,
+                short_description="The name of the column(s) to pre-select"),
+            "is_regex": BoolParam(
+                default_value=False, human_name="Is text pattern?",
+                short_description="Set True if it is a text pattern (regular expression), False otherwise")
+        }, human_name="Pre-selected column names", short_description=f"The names of column to pre-select for comparison. By default, the first {BasePairwiseStatsTask.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used", optional=True),
+        # "column_names": ListParam(
+        #     default_value=[], human_name="Column names",
+        #     short_description=f"The names of the columns to test against the expected value. By default, the first {BasePairwiseStatsTask.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used"),
         'expected_value': FloatParam(default_value=0.0, human_name="Expected value", short_description="The expected value in null hypothesis"),
         "alternative_hypothesis": StrParam(default_value="two-sided",
                                            allowed_values=["two-sided", "less", "greater"],
@@ -77,16 +87,12 @@ class TTestOneSample(BasePairwiseStatsTask):
 
     async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs['table']
+        selected_cols = params.get_value("preselected_column_names")
+        if selected_cols:
+            table = table.select_by_column_names(selected_cols)
+
         data = table.get_data()
         data = data.apply(pandas.to_numeric, errors='coerce')
-
-        target_cols = params.get_value("column_names")
-        if target_cols:
-            data = data.loc[:, target_cols]
-        else:
-            self.log_info_message(
-                f"No column names given. The first {self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used.")
-            data = data.iloc[:, 0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]
 
         is_nan_log_shown = False
         all_result = None
@@ -113,8 +119,8 @@ class TTestOneSample(BasePairwiseStatsTask):
                 all_result = pandas.concat([all_result, df], axis=0, ignore_index=True)
 
         # adjust pvalue
-        all_result = self._adjust_pvals(all_result, params)
+        all_result_dict = self._adjust_pvals(all_result, False, params)
 
         t = self.output_specs["result"].get_default_resource_type()
-        result = t(result=all_result, input_table=table)
+        result = t(result=all_result_dict, input_table=table)
         return {'result': result}

@@ -15,16 +15,16 @@ class BaseStatsResult(BaseResource):
     PVALUE_NAME = "PValue"
     STATISTICS_NAME = "Statistic"
 
-    STATISTIC_TABLE_NAME = "Statistics table"
+    FULL_STATISTIC_TABLE_NAME = "Statistics table"
 
     def __init__(self, result=None, input_table: Table = None):
         super().__init__(result=result, input_table=input_table)
         if result is not None:
             self._create_statistics_table()
 
-    def get_statistics_table(self) -> DataFrame:
-        if self.resource_exists(self.STATISTIC_TABLE_NAME):
-            return self.get_resource(self.STATISTIC_TABLE_NAME)
+    def get_full_statistics_table(self) -> DataFrame:
+        if self.resource_exists(self.FULL_STATISTIC_TABLE_NAME):
+            return self.get_resource(self.FULL_STATISTIC_TABLE_NAME)
         else:
             return None
 
@@ -35,7 +35,7 @@ class BaseStatsResult(BaseResource):
             self.PVALUE_NAME
         ]
         table = Table(data=stat_result, column_names=columns)
-        table.name = self.STATISTIC_TABLE_NAME
+        table.name = self.FULL_STATISTIC_TABLE_NAME
         self.add_resource(table)
 
     # @view(view_type=TabularView, default_view=True, human_name="Statistics table",

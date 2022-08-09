@@ -13,7 +13,7 @@ class TestTTestTwoPairedSamples(BaseTestCase):
         settings = Settings.retrieve()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
-            File(path=os.path.join(test_dir, "./dataset7.csv")),
+            File(path=os.path.join(test_dir, "./bacteria.csv")),
             params={
                 "delimiter": ",",
                 "header": 0

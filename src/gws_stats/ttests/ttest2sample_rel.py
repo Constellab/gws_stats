@@ -19,7 +19,7 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 # *****************************************************************************
 
 
-@resource_decorator("TTestTwoRelatedSamplesResult", human_name="T-test two rel. samples result",
+@resource_decorator("TTestTwoRelatedSamplesResult", human_name="T-test with rel. samples result",
                     short_description="Result of related samples Student test(T-Test)", hide=True)
 class TTestTwoRelatedSamplesResult(BasePairwiseStatsResult):
     STATISTICS_NAME = "TStatistic"
@@ -31,13 +31,14 @@ class TTestTwoRelatedSamplesResult(BasePairwiseStatsResult):
 # *****************************************************************************
 
 
-@ task_decorator("TTestTwoRelatedSamples", human_name="T-test two rel. samples",
-                 short_description="Test that the means of two related samples are equal")
+@ task_decorator("TTestTwoRelatedSamples", human_name="T-test with rel. samples",
+                 short_description="Test that the means of two related samples are equal. Performs pairwise analysis for more than two samples.")
 class TTestTwoRelatedSamples(BasePairwiseStatsTask):
     """
     Compute the T-test for the means of related samples, from a given reference sample.
 
     This test is a two-sided (or one-side) test for the null hypothesis that 2 related samples have identical average (expected) values.
+    Performs pairwise analysis for more than two samples.
 
     * Input: a table containing the sample measurements, with the name of the samples.
     * Output: a table listing the T-statistic, and the p-value for each pairwise comparison testing.
@@ -56,7 +57,7 @@ class TTestTwoRelatedSamples(BasePairwiseStatsTask):
                                            human_name="Alternative hypothesis",
                                            short_description="The alternative hypothesis chosen for the testing.")
     }
-    _remove_nan_before_compute = False
+    _remove_nan_before_compute = True # ensure that related sample are paired!
 
     def compute_stats(self, current_data, ref_col, target_col, params: ConfigParams):
         alternative = params.get_value("alternative_hypothesis")

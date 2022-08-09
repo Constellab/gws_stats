@@ -7,10 +7,6 @@ import numpy as np
 from gws_core import (ResourceRField, ResourceSet, RField, Table,
                       resource_decorator)
 
-# ==============================================================================
-# ==============================================================================
-
-
 @resource_decorator("BaseResource", hide=True)
 class BaseResource(ResourceSet):
     _result: np.array = RField(default_value=None)

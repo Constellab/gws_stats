@@ -8,8 +8,8 @@ from gws_core import (ConfigParams, InputSpec, OutputSpec, Table,
                       resource_decorator, task_decorator)
 from scipy.stats import kruskal
 
-from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
-from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
+from ...base.base_pairwise_stats_result import BasePairwiseStatsResult
+from ...base.base_pairwise_stats_task import BasePairwiseStatsTask
 
 # *****************************************************************************
 #
@@ -19,7 +19,8 @@ from ..base.base_pairwise_stats_task import BasePairwiseStatsTask
 
 
 @resource_decorator("PairwiseKruskalWallisResult", human_name="Pairwise Kruskal-Wallis result",
-                    short_description="Result of pairwise Kruskal-Wallis H-test", hide=True)
+                    short_description="Result of pairwise Kruskal-Wallis H-test", hide=True,
+                    deprecated_since='0.3.1', deprecated_message="This resource is deprecated")
 class PairwiseKruskalWallisResult(BasePairwiseStatsResult):
     STATISTICS_NAME = "H-Statistic"
 
@@ -31,7 +32,8 @@ class PairwiseKruskalWallisResult(BasePairwiseStatsResult):
 
 
 @task_decorator("PairwiseKruskalWallis", human_name="Pairwise Kruskal-Wallis",
-                short_description="Test that two groups have the same population median")
+                short_description="Test that two groups have the same population median",
+                hide=True, deprecated_since='0.3.1', deprecated_message="This task is deprecated")
 class PairwiseKruskalWallis(BasePairwiseStatsTask):
     """
     Compute the Kruskal-Wallis H-test for pairwise independent samples, from a given reference sample.

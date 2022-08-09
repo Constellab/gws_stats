@@ -5,11 +5,13 @@
 
 import numpy as np
 import pandas
-from gws_core import (ConfigParams, ListParam, Table, Task, TaskInputs,
-                      TaskOutputs, resource_decorator, task_decorator, InputSpec, OutputSpec)
+from gws_core import (ConfigParams, InputSpec, ListParam, OutputSpec, Table,
+                      Task, TaskInputs, TaskOutputs, resource_decorator,
+                      task_decorator)
 from scipy.stats import kruskal
 
-from ..base.base_stats_result import BaseStatsResult
+from ..base.base_population_stats_result import BasePopulationStatsResult
+from ..base.base_population_stats_task import BasePopulationStatsTask
 
 # *****************************************************************************
 #
@@ -20,8 +22,9 @@ from ..base.base_stats_result import BaseStatsResult
 
 @resource_decorator("KruskalWallisResult", human_name="Population Kruskal-Wallis result",
                     short_description="Result of multiple Kruskal-Wallis H-test", hide=True)
-class KruskalWallisResult(BaseStatsResult):
-    pass
+class KruskalWallisResult(BasePopulationStatsResult):
+    """ KruskalWallisResult """
+    STATISTICS_NAME = "H-Statistic"
 
 # *****************************************************************************
 #
@@ -30,9 +33,9 @@ class KruskalWallisResult(BaseStatsResult):
 # *****************************************************************************
 
 
-@task_decorator("KruskalWallis", human_name="Population Kruskal-Wallis",
+@task_decorator("KruskalWallis", human_name="Kruskal-Wallis",
                 short_description="Test that two or more groups have the same population median")
-class KruskalWallis(Task):
+class KruskalWallis(BasePopulationStatsTask):
     """
     Compute the Kruskal-Wallis H-test for independent samples.
 
@@ -57,34 +60,11 @@ class KruskalWallis(Task):
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kruskal.html
     """
 
-    DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE = 99
-
     input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
-    output_specs = {'result': OutputSpec(KruskalWallisResult, human_name="Result", short_description="The output result")}
-    config_specs = {
-        "column_names": ListParam(
-            default_value=[], human_name="Column names",
-            short_description="The names of the columns that represent the groups to compare")
-    }
+    output_specs = {'result': OutputSpec(KruskalWallisResult, human_name="Result",
+                                         short_description="The output result")}
 
-    async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
-        table = inputs['table']
-        data = table.get_data()
-        data = data.apply(pandas.to_numeric, errors='coerce')
-
-        column_names = params.get_value("column_names", [])
-        if not column_names:
-            column_names = data.columns[0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]
-
-        data = data[column_names].to_numpy().T
-        array_sum = np.sum(data)
-        array_has_nan = np.isnan(array_sum)
-
-        if array_has_nan:
-            self.log_warning_message("Data contain NaN values. NaN values are omitted.")
-        stat_result = kruskal(*data, nan_policy='omit')
-
-        stat_result = [stat_result.statistic, stat_result.pvalue]
-        stat_result = pandas.DataFrame([stat_result])
-        result = KruskalWallisResult(result=stat_result, input_table=table)
-        return {'result': result}
+    def compute_stats(self, data, _: ConfigParams):
+        """ Compute stats """
+        stat_result = kruskal(*data)
+        return stat_result

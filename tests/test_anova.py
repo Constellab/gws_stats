@@ -2,12 +2,13 @@ import os
 
 from gws_core import (BaseTestCase, ConfigParams, DatasetImporter, File, GTest,
                       Settings, Table, TableImporter, TaskRunner, ViewTester)
+from gws_core.extra import DataProvider
 from gws_stats import OneWayAnova
 
 
 class TestAnova(BaseTestCase):
 
-    async def test_process(self):
+    async def test_anova(self):
         settings = Settings.retrieve()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
@@ -29,4 +30,20 @@ class TestAnova(BaseTestCase):
         anova_result = outputs['result']
 
         print(table)
-        print(anova_result.get_result())
+        print(anova_result.get_statistics_table())
+
+    async def test_anova_with_group_comparison(self):
+        table = DataProvider.get_iris_table()
+        tester = TaskRunner(
+            params={'row_tag_key': 'variety',
+                    'preselected_column_names': [
+                        {'name': 'petal.*', 'is_regex': True},
+                        {'name': 'sepal.*', 'is_regex': True}]
+                    },
+            inputs={'table': table},
+            task_type=OneWayAnova)
+        outputs = await tester.run()
+        result = outputs['result']
+
+        print(table)
+        print(result.get_statistics_table())
