@@ -22,6 +22,47 @@ class BasePopulationStatsTask(Task):
     BasePopulationStatsTask
 
     Performs comparison of multiple columns of a table
+
+    * Input: a table containing the sample measurements, with the name of the samples.
+    * Output: a table listing the correlation coefficient, and its associated p-value for each pairwise comparison testing.
+    * Config Parameters:
+      - `preselected_column_names`: List of columns to pre-select for pairwise comparisons. By default a maximum pre-defined number of columns are selected (see configuration).
+      - `row_tag_key`: If give, this parameter is used for group-wise comparisons along row tags (see example below). This parameter is ignored of a `reference_column` is given.
+
+    # Example 1: Direct column comparisons
+
+    Let's say you have the following table.
+
+    | A | B | C |
+    |---|---|---|
+    | 1 | 5 | 3 |
+    | 2 | 6 | 8 |
+    | 3 | 7 | 5 |
+    | 4 | 8 | 4 |
+
+    This task performs population comparison of almost all the columns of the table
+    (the first `500` columns are pre-selected by default).
+
+    # Example 2: Advanced comparisons along row tags using `row_tag_key` parameter
+
+    In general, the table rows represent real-world observations (e.g. measured samples) and columns correspond to
+    descriptors (a.k.a features or variables).
+    Theses rows (samples) may therefore be related to metadata information given by row tags as follows:
+
+    | row_tags                 | A | B | C |
+    |--------------------------|---|---|---|
+    | Gender : M <br> Age : 10 | 1 | 5 | 3 |
+    | Gender : F <br> Age : 10 | 2 | 6 | 8 |
+    | Gender : F <br> Age : 10 | 8 | 7 | 5 |
+    | Gender : X <br> Age : 20 | 4 | 8 | 4 |
+    | Gender : X <br> Age : 10 | 2 | 7 | 5 |
+    | Gender : M <br> Age : 20 | 4 | 1 | 4 |
+
+    Actually, the column ```row_tags``` does not really exist in the table. It is just to show here the tags of the rows
+    Here, the first row correspond to 10-years old male individuals.
+    In this this case, we may be interested in only comparing several columns along row metadata tags.
+    For instance, to compare gender populations `M`, `F`, `X` for each columns separately, you can therefore use the advance parameter `row_tag_key`=`Gender`.
+
     """
 
     DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE = 500
@@ -43,7 +84,7 @@ class BasePopulationStatsTask(Task):
         StrParam(
             default_value=None, optional=True, human_name="Row tag key (for group-wise comparisons)",
             visibility=StrParam.PROTECTED_VISIBILITY,
-            short_description="The key of the row tag (representing the group axis) along which one would like to compare each column. This parameter is not used if a `reference column` is given.")
+            short_description="The key of the row tag (representing the group axis) along which one would like to compare each column")
     }
 
     _remove_nan_before_compute = True

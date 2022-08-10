@@ -41,6 +41,36 @@ class TTestOneSample(BasePairwiseStatsTask):
 
     This is a test for the null hypothesis that the expected value (mean) of a sample of independent observations a is equal to the given population mean, popmean.
 
+    ---
+
+    * Input: a table containing the sample measurements, with the name of the samples.
+    * Output: a table listing the correlation coefficient, and its associated p-value for each pairwise comparison testing.
+    * Config Parameters:
+      - `preselected_column_names`: List of columns to pre-select for pairwise comparisons. By default a maximum pre-defined number of columns are selected (see configuration).
+      - `expected_value`: This value is compared against all the other columns means.
+      - `adjust_pvalue`:
+        - `method`: The correction method for p-value adjustment in multiple testing.
+        - `alpha`: The FWER, family-wise error rate. Default is 0.05.
+      - `alternative_hypothesis`: The alternative hypothesis chosen for the testing (`two-sided`, `less` or `greater`)
+
+    # Example:
+
+    Let's say you have the following table.
+
+    | A | B | C |
+    |---|---|---|
+    | 1 | 5 | 3 |
+    | 2 | 6 | 8 |
+    | 3 | 7 | 5 |
+    | 4 | 8 | 4 |
+
+    This task performs comparisons of almost all the columns mean of the table agains an `expected_value`
+    (the first `500` columns are pre-selected by default).
+
+    The `expected_value` will be compared with the means of `A`, `B`, `C`, respectively
+
+    ---
+
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html
     """
     input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
