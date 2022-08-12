@@ -142,7 +142,7 @@ class BasePopulationStatsTask(Task):
             array_has_nan = np.isnan(array_sum)
             if array_has_nan:
                 self.log_warning_message("Data contain NaN values. NaN values are omitted.")
-                sub_data = [[x for x in y if not np.isnan(x)] for y in data]  # remove nan values
+                sub_data = [[x for x in y if not np.isnan(x)] for y in sub_data]  # remove nan values
 
             # compare all the unfolded columns
             stat_result = self.compute_stats(sub_data, params)
