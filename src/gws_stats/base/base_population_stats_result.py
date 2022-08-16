@@ -14,6 +14,7 @@ class BasePopulationStatsResult(BaseResource):
     """ BasePopulationStatsResult """
 
     PVALUE_NAME = "PValue"
+    ADJUSTED_PVALUE_NAME = "Adjusted_PValue"
     STATISTICS_NAME = "Statistic"
     STATISTIC_TABLE_NAME = "Statistics table"
 
@@ -34,6 +35,7 @@ class BasePopulationStatsResult(BaseResource):
             "Columns",
             self.STATISTICS_NAME,
             self.PVALUE_NAME,
+            self.ADJUSTED_PVALUE_NAME
         ]
 
         table = Table(data=stat_result, column_names=columns)

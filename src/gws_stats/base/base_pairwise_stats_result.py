@@ -27,7 +27,7 @@ class BasePairwiseStatsResult(BaseResource):
     STATISTICS_CONTINGENCY_TABLE_NAME = "Contingency table - Statistics"
 
     _GROUP_STATISTIC_TABLE_NAME = "Statistics table - %"
-    
+
     _group_statistic_table_names = ListRField()
 
     def __init__(self, result=None, input_table: Table = None):
@@ -91,8 +91,8 @@ class BasePairwiseStatsResult(BaseResource):
         ]
         columns = sorted(list(set(columns)))
         n = len(columns)
-
-        cdata = DataFrame(np.ones([n, n]), columns=columns, index=columns)
+        cdata = np.empty([n, n]).fill(np.nan)
+        cdata = DataFrame(cdata, columns=columns, index=columns)
         for i in range(0, stats_data.shape[0]):
             col1 = stats_data.loc[i, self.REFERENCE_NAME]
             col2 = stats_data.loc[i, self.COMPARED_NAME]

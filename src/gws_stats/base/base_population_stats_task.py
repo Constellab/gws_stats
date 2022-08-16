@@ -12,6 +12,7 @@ from gws_core import (BadRequestException, BoolParam, ConfigParams, FloatParam,
                       Table, TableUnfolderHelper, Task, TaskInputs,
                       TaskOutputs, task_decorator)
 from pandas import concat
+from statsmodels.stats.multitest import multipletests
 
 from ..base.base_population_stats_result import BasePopulationStatsResult
 
@@ -66,6 +67,8 @@ class BasePopulationStatsTask(Task):
     """
 
     DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE = 500
+    DEFAULT_ADJUST_METHOD = "bonferroni"
+    DEFAULT_ADJUST_ALPHA = 0.05
 
     input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
     output_specs = {'result': OutputSpec(BasePopulationStatsResult, human_name="Result",
@@ -84,7 +87,18 @@ class BasePopulationStatsTask(Task):
         StrParam(
             default_value=None, optional=True, human_name="Row tag key (for group-wise comparisons)",
             visibility=StrParam.PROTECTED_VISIBILITY,
-            short_description="The key of the row tag (representing the group axis) along which one would like to compare each column")
+            short_description="The key of the row tag (representing the group axis) along which one would like to compare each column"),
+        "adjust_pvalue":
+        ParamSet({
+            "method": StrParam(
+                default_value=DEFAULT_ADJUST_METHOD, human_name="Correction method",
+                allowed_values=["bonferroni", "fdr_bh", "fdr_by", "fdr_tsbh", "fdr_tsbky",
+                                "sidak", "holm-sidak", "holm", "simes-hochberg", "hommel"],
+                short_description="The method used to adjust (correct) p-values", visibility=FloatParam.PROTECTED_VISIBILITY),
+            "alpha": FloatParam(
+                default_value=DEFAULT_ADJUST_ALPHA, min_value=0, max_value=1, human_name="Alpha",
+                short_description=f"FWER, family-wise error rate Default is {DEFAULT_ADJUST_ALPHA}", visibility=StrParam.PROTECTED_VISIBILITY)
+        }, human_name="Adjust p-values", short_description="Adjust p-values for multiple tests. It is only used when the `row_tag_key` is set.", max_number_of_occurrences=1, optional=True, visibility=ParamSet.PROTECTED_VISIBILITY)
     }
 
     _remove_nan_before_compute = True
@@ -110,6 +124,14 @@ class BasePopulationStatsTask(Task):
         result = t(result=stat_result, input_table=table)
         return {'result': result}
 
+    def _do_adjust_pvals(self, data, adjust_method, adjust_alpha):
+        _, pvals_corrected, _, _ = multipletests(
+            data.iloc[:, 2].to_numpy().flatten(),
+            adjust_alpha, adjust_method)
+        pvals_corrected = pandas.DataFrame(pvals_corrected)
+        pvals_corrected.index = data.index
+        return pandas.concat([data, pvals_corrected], axis=1, ignore_index=True)
+
     def _column_compare(self, table, params):
         data = table.get_data()
         data = data.apply(pandas.to_numeric, errors='coerce')
@@ -120,7 +142,7 @@ class BasePopulationStatsTask(Task):
             data = [[x for x in y if not np.isnan(x)] for y in data]  # remove nan values
 
         stat_result = self.compute_stats(data, params)
-        stat_result = ["*", stat_result.statistic, stat_result.pvalue]
+        stat_result = ["*", stat_result.statistic, stat_result.pvalue, np.nan]
         stat_result = pandas.DataFrame([stat_result])
         return stat_result
 
@@ -153,5 +175,15 @@ class BasePopulationStatsTask(Task):
                 stat_result = [data.columns[k], stat_result.statistic, stat_result.pvalue]
                 stat_result = pandas.DataFrame([stat_result])
                 all_stat_result = pandas.concat([all_stat_result, stat_result], axis=0, ignore_index=True)
+
+        # adjust pvalue
+        paraset = params.get_value("adjust_pvalue")
+        if len(paraset) == 0:
+            adjust_method = self.DEFAULT_ADJUST_METHOD
+            adjust_alpha = self.DEFAULT_ADJUST_ALPHA
+        else:
+            adjust_method = paraset[0].get("method", self.DEFAULT_ADJUST_METHOD)
+            adjust_alpha = paraset[0].get("alpha", self.DEFAULT_ADJUST_ALPHA)
+        all_stat_result = self._do_adjust_pvals(all_stat_result, adjust_method, adjust_alpha)
 
         return all_stat_result

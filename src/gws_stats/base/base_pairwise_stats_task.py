@@ -117,8 +117,8 @@ class BasePairwiseStatsTask(Task):
                 short_description="The method used to adjust (correct) p-values", visibility=FloatParam.PROTECTED_VISIBILITY),
             "alpha": FloatParam(
                 default_value=DEFAULT_ADJUST_ALPHA, min_value=0, max_value=1, human_name="Alpha",
-                short_description="FWER, family-wise error rate", visibility=StrParam.PROTECTED_VISIBILITY)
-        }, human_name="Adjust p-values", short_description="Adjust p-values for multiple tests", max_number_of_occurrences=1, optional=True, visibility=ParamSet.PROTECTED_VISIBILITY)
+                short_description=f"FWER, family-wise error rate. Default is {DEFAULT_ADJUST_ALPHA}", visibility=StrParam.PROTECTED_VISIBILITY)
+        }, human_name="Adjust p-values", short_description=f"Adjust p-values for multiple tests.", max_number_of_occurrences=1, optional=True, visibility=ParamSet.PROTECTED_VISIBILITY)
     }
 
     _remove_nan_before_compute = True
