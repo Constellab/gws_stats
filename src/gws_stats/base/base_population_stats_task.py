@@ -102,6 +102,7 @@ class BasePopulationStatsTask(Task):
     }
 
     _remove_nan_before_compute = True
+    _is_nan_warning_shown = False
 
     @abstractmethod
     def compute_stats(self, data, params: ConfigParams):
@@ -138,8 +139,10 @@ class BasePopulationStatsTask(Task):
         array_has_nan = data.isnull().sum().sum()
         data = data.to_numpy().T
         if array_has_nan:
-            self.log_warning_message("Data contain NaN values. NaN values are omitted.")
             data = [[x for x in y if not np.isnan(x)] for y in data]  # remove nan values
+            if not self._is_nan_warning_shown:
+                self.log_warning_message("Data contain NaN values. NaN values are omitted.")
+                self._is_nan_warning_shown = True
 
         stat_result = self.compute_stats(data, params)
         stat_result = ["*", stat_result.statistic, stat_result.pvalue, np.nan]
@@ -163,8 +166,10 @@ class BasePopulationStatsTask(Task):
             array_sum = np.sum(sub_data)
             array_has_nan = np.isnan(array_sum)
             if array_has_nan:
-                self.log_warning_message("Data contain NaN values. NaN values are omitted.")
                 sub_data = [[x for x in y if not np.isnan(x)] for y in sub_data]  # remove nan values
+                if not self._is_nan_warning_shown:
+                    self.log_warning_message("Data contain NaN values. NaN values are omitted.")
+                    self._is_nan_warning_shown = True
 
             # compare all the unfolded columns
             stat_result = self.compute_stats(sub_data, params)
@@ -177,7 +182,7 @@ class BasePopulationStatsTask(Task):
                 all_stat_result = pandas.concat([all_stat_result, stat_result], axis=0, ignore_index=True)
 
         # adjust pvalue
-        paraset = params.get_value("adjust_pvalue")
+        paraset = params.get_value("adjust_pvalue", [])
         if len(paraset) == 0:
             adjust_method = self.DEFAULT_ADJUST_METHOD
             adjust_alpha = self.DEFAULT_ADJUST_ALPHA

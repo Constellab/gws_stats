@@ -118,10 +118,11 @@ class BasePairwiseStatsTask(Task):
             "alpha": FloatParam(
                 default_value=DEFAULT_ADJUST_ALPHA, min_value=0, max_value=1, human_name="Alpha",
                 short_description=f"FWER, family-wise error rate. Default is {DEFAULT_ADJUST_ALPHA}", visibility=StrParam.PROTECTED_VISIBILITY)
-        }, human_name="Adjust p-values", short_description=f"Adjust p-values for multiple tests.", max_number_of_occurrences=1, optional=True, visibility=ParamSet.PROTECTED_VISIBILITY)
+        }, human_name="Adjust p-values", short_description="Adjust p-values for multiple tests.", max_number_of_occurrences=1, optional=True, visibility=ParamSet.PROTECTED_VISIBILITY)
     }
 
     _remove_nan_before_compute = True
+    _is_nan_warning_shown = False
 
     @abstractmethod
     def compute_stats(self, current_data, ref_col, target_col, params: ConfigParams):
@@ -156,7 +157,7 @@ class BasePairwiseStatsTask(Task):
 
     def _adjust_pvals(self, all_result, is_group_comparison, params):
         # adjust pvalue
-        paraset = params.get_value("adjust_pvalue")
+        paraset = params.get_value("adjust_pvalue", [])
         if len(paraset) == 0:
             adjust_method = self.DEFAULT_ADJUST_METHOD
             adjust_alpha = self.DEFAULT_ADJUST_ALPHA
@@ -261,7 +262,6 @@ class BasePairwiseStatsTask(Task):
 
     def _do_comparisons(self, data, params, reference_columns=None):
         all_result = None
-        is_nan_log_shown = False
         if reference_columns is None:
             reference_columns = []
 
@@ -289,9 +289,9 @@ class BasePairwiseStatsTask(Task):
                 if array_has_nan:
                     if self._remove_nan_before_compute:
                         current_data = [[x for x in y if not np.isnan(x)] for y in current_data]
-                    if not is_nan_log_shown:
+                    if not self._is_nan_warning_shown:
                         self.log_warning_message("Data contain NaN values. NaN values are omitted.")
-                        is_nan_log_shown = True
+                        self._is_nan_warning_shown = True
 
                 stat_result = self.compute_stats(current_data, ref_col, target_col, params)
                 if all_result is None:
