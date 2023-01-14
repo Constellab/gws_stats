@@ -8,7 +8,7 @@ from gws_stats import PearsonCorrelation, PValueAdjust
 class TestPValueAdjust(BaseTestCase):
 
     async def test_process(self):
-        settings = Settings.retrieve()
+        settings = Settings.get_instance()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
             File(path=os.path.join(test_dir, "./bacteria.csv")),
