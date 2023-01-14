@@ -11,7 +11,7 @@ from gws_stats import NormalTest
 class TestNormalTest(BaseTestCase):
 
     async def test_process(self):
-        settings = Settings.retrieve()
+        settings = Settings.get_instance()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
             File(path=os.path.join(test_dir, "./dataset7.csv")),
