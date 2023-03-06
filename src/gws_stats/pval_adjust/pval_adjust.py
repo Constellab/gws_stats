@@ -71,7 +71,7 @@ class PValueAdjust(Task):
         stat_result = pvals_corrected
         return stat_result
 
-    async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
+    def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs['table']
         data = table.get_data()
         data = data.apply(pandas.to_numeric, errors='coerce')

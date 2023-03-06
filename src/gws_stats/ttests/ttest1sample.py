@@ -115,7 +115,7 @@ class TTestOneSample(BasePairwiseStatsTask):
         stat_result = [f"ExpectedValue = {exp_val}", target_col, stat_result.statistic, stat_result.pvalue]
         return stat_result
 
-    async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
+    def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs['table']
         selected_cols = params.get_value("preselected_column_names")
         if selected_cols:

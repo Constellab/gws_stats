@@ -8,9 +8,9 @@ from abc import abstractmethod
 import numpy as np
 import pandas
 from gws_core import (BadRequestException, BoolParam, ConfigParams, FloatParam,
-                      InputSpec, ListParam, OutputSpec, ParamSet, StrParam,
-                      Table, TableUnfolderHelper, Task, TaskInputs,
-                      TaskOutputs, task_decorator)
+                      InputSpec, OutputSpec, ParamSet, StrParam, Table,
+                      TableUnfolderHelper, Task, TaskInputs, TaskOutputs,
+                      task_decorator)
 from pandas import concat
 from statsmodels.stats.multitest import multipletests
 
@@ -133,7 +133,7 @@ class BasePairwiseStatsTask(Task):
         """ Remove nan """
         pass
 
-    async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
+    def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs['table']
         reference_column = params.get_value("reference_column")
         row_tag_key = params.get_value("row_tag_key")

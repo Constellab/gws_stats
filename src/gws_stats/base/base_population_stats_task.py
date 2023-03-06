@@ -109,7 +109,7 @@ class BasePopulationStatsTask(Task):
         """ Compute stats """
         return None
 
-    async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
+    def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs['table']
         selected_cols = params.get_value("preselected_column_names")
         if selected_cols:

@@ -1,14 +1,13 @@
 import os
 
-from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
-                      TableImporter, TaskRunner, ViewTester)
+from gws_core import BaseTestCase, File, Settings, TableImporter, TaskRunner
 from gws_core.extra import DataProvider
 from gws_stats import PearsonCorrelation
 
 
 class TestPairwiseCorrelationCoef(BaseTestCase):
 
-    async def test_pearson(self):
+    def test_pearson(self):
         settings = Settings.get_instance()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
@@ -26,7 +25,7 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
             inputs={'table': table},
             task_type=PearsonCorrelation
         )
-        outputs = await tester.run()
+        outputs = tester.run()
         pairwise_correlationcoef_result = outputs['result']
 
         print(table)
@@ -40,14 +39,14 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
             inputs={'table': table},
             task_type=PearsonCorrelation
         )
-        outputs = await tester.run()
+        outputs = tester.run()
         pairwise_correlationcoef_result = outputs['result']
 
         print(table)
         print(pairwise_correlationcoef_result.get_full_statistics_table())
         print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))
 
-    async def test_pearson_with_group_comparison(self):
+    def test_pearson_with_group_comparison(self):
         table = DataProvider.get_iris_table()
         print(table)
         tester = TaskRunner(
@@ -58,7 +57,7 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
                     },
             inputs={'table': table},
             task_type=PearsonCorrelation)
-        outputs = await tester.run()
+        outputs = tester.run()
         pairwise_correlationcoef_result = outputs['result']
         print(pairwise_correlationcoef_result.get_full_statistics_table())
         print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))

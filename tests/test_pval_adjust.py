@@ -1,13 +1,12 @@
 import os
 
-from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
-                      TableImporter, TaskRunner, ViewTester)
+from gws_core import BaseTestCase, File, Settings, TableImporter, TaskRunner
 from gws_stats import PearsonCorrelation, PValueAdjust
 
 
 class TestPValueAdjust(BaseTestCase):
 
-    async def test_process(self):
+    def test_process(self):
         settings = Settings.get_instance()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
@@ -25,7 +24,7 @@ class TestPValueAdjust(BaseTestCase):
             inputs={'table': table},
             task_type=PearsonCorrelation
         )
-        outputs = await tester.run()
+        outputs = tester.run()
         pairwise_correlationcoef_result = outputs['result']
 
         print(table)
@@ -38,7 +37,7 @@ class TestPValueAdjust(BaseTestCase):
             inputs={'table': table},
             task_type=PearsonCorrelation
         )
-        outputs = await tester.run()
+        outputs = tester.run()
         pairwise_correlationcoef_result = outputs['result']
 
         stat_table = pairwise_correlationcoef_result.get_full_statistics_table()
@@ -51,7 +50,7 @@ class TestPValueAdjust(BaseTestCase):
             inputs={'table': stat_table},
             task_type=PValueAdjust
         )
-        outputs = await tester.run()
+        outputs = tester.run()
         table = outputs['table']
         print(table)
 
@@ -62,6 +61,6 @@ class TestPValueAdjust(BaseTestCase):
             inputs={'table': stat_table},
             task_type=PValueAdjust
         )
-        outputs = await tester.run()
+        outputs = tester.run()
         table = outputs['table']
         print(table)

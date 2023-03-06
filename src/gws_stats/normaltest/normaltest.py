@@ -71,7 +71,7 @@ class NormalTest(Task):
             short_description="The key of the row tag (representing the group axis) along which one would like to do tests")
     }
 
-    async def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
+    def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs["table"]
         selected_cols = params.get_value("preselected_column_names")
         if selected_cols:

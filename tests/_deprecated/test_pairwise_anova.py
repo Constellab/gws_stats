@@ -7,7 +7,7 @@ from gws_stats import PairwiseOneWayAnova
 
 class TestPairwiseANOVA(BaseTestCase):
 
-    async def test_process(self):
+    def test_process(self):
         settings = Settings.get_instance()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
@@ -25,7 +25,7 @@ class TestPairwiseANOVA(BaseTestCase):
             inputs={'table': table},
             task_type=PairwiseOneWayAnova
         )
-        outputs = await tester.run()
+        outputs = tester.run()
         anova_result = outputs['result']
 
         print(table)

@@ -8,7 +8,7 @@ from gws_stats import OneWayAnova
 
 class TestAnova(BaseTestCase):
 
-    async def test_anova(self):
+    def test_anova(self):
         settings = Settings.get_instance()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
@@ -26,13 +26,13 @@ class TestAnova(BaseTestCase):
             inputs={'table': table},
             task_type=OneWayAnova
         )
-        outputs = await tester.run()
+        outputs = tester.run()
         anova_result = outputs['result']
 
         print(table)
         print(anova_result.get_statistics_table())
 
-    async def test_anova_with_group_comparison(self):
+    def test_anova_with_group_comparison(self):
         table = DataProvider.get_iris_table()
         tester = TaskRunner(
             params={'row_tag_key': 'variety',
@@ -42,7 +42,7 @@ class TestAnova(BaseTestCase):
                     },
             inputs={'table': table},
             task_type=OneWayAnova)
-        outputs = await tester.run()
+        outputs = tester.run()
         result = outputs['result']
 
         print(table)

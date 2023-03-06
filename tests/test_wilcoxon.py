@@ -9,7 +9,7 @@ from gws_stats import Wilcoxon
 
 class TestWicoxon(BaseTestCase):
 
-    async def test_process(self):
+    def test_process(self):
         settings = Settings.get_instance()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
@@ -27,7 +27,7 @@ class TestWicoxon(BaseTestCase):
             inputs={'table': table},
             task_type=Wilcoxon
         )
-        outputs = await tester.run()
+        outputs = tester.run()
         wilcoxon_result = outputs['result']
 
         print(table)

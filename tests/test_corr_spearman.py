@@ -1,13 +1,12 @@
 import os
 
-from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
-                      TableImporter, TaskRunner, ViewTester)
+from gws_core import BaseTestCase, File, Settings, TableImporter, TaskRunner
 from gws_stats import SpearmanCorrelation
 
 
 class TestPairwiseCorrelationCoef(BaseTestCase):
 
-    async def test_process(self):
+    def test_process(self):
         settings = Settings.get_instance()
         test_dir = settings.get_variable("gws_stats:testdata_dir")
         table = TableImporter.call(
@@ -25,7 +24,7 @@ class TestPairwiseCorrelationCoef(BaseTestCase):
             inputs={'table': table},
             task_type=SpearmanCorrelation
         )
-        outputs = await tester.run()
+        outputs = tester.run()
         pairwise_correlationcoef_result = outputs['result']
 
         print(table)
