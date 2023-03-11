@@ -112,8 +112,9 @@ class PValueAdjust(Task):
         if all_result is None:
             raise BadRequestException("No valid p-value found. Please ensure that values are between 0 and 1.")
 
+        all_result.index = table.get_data().index
         all_result = pandas.concat([table.get_data(), all_result], axis=1)
 
         result_table = Table(data=all_result)
-        result_table.set_all_rows_tags(table.get_row_tags())
+        result_table.set_all_row_tags(table.get_row_tags())
         return {'table': result_table}

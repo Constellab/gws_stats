@@ -94,17 +94,18 @@ class BasePairwiseStatsResult(BaseResource):
         cdata = np.empty([n, n]).fill(np.nan)
         cdata = DataFrame(cdata, columns=columns, index=columns)
         for i in range(0, stats_data.shape[0]):
-            col1 = stats_data.loc[i, self.REFERENCE_NAME]
-            col2 = stats_data.loc[i, self.COMPARED_NAME]
+            index = str(i)
+            col1 = stats_data.loc[index, self.REFERENCE_NAME]
+            col2 = stats_data.loc[index, self.COMPARED_NAME]
             if metric.lower() == self.PVALUE_NAME.lower():
-                cdata.at[col1, col2] = stats_data.loc[i, self.PVALUE_NAME]
-                cdata.at[col2, col1] = stats_data.loc[i, self.PVALUE_NAME]
+                cdata.at[col1, col2] = stats_data.loc[index, self.PVALUE_NAME]
+                cdata.at[col2, col1] = stats_data.loc[index, self.PVALUE_NAME]
             elif metric.lower() == self.ADJUSTED_PVALUE_NAME.lower():
-                cdata.at[col1, col2] = stats_data.loc[i, self.ADJUSTED_PVALUE_NAME]
-                cdata.at[col2, col1] = stats_data.loc[i, self.ADJUSTED_PVALUE_NAME]
+                cdata.at[col1, col2] = stats_data.loc[index, self.ADJUSTED_PVALUE_NAME]
+                cdata.at[col2, col1] = stats_data.loc[index, self.ADJUSTED_PVALUE_NAME]
             elif metric.lower() == self.STATISTICS_NAME.lower():
-                cdata.at[col1, col2] = stats_data.loc[i, self.STATISTICS_NAME]
-                cdata.at[col2, col1] = stats_data.loc[i, self.STATISTICS_NAME]
+                cdata.at[col1, col2] = stats_data.loc[index, self.STATISTICS_NAME]
+                cdata.at[col2, col1] = stats_data.loc[index, self.STATISTICS_NAME]
             else:
                 raise BadRequestException(f"Cannot create contingency table. Invalid metric '{metric}'.")
 
