@@ -27,23 +27,50 @@ class MCSampler:
     # -- B --
 
     @staticmethod
-    def _build_distribs(priors: list):
-        dist_list = []
+    def _build_distribs(priors: list, use_dist=False):
+        if not isinstance(priors, list):
+            raise BadRequestException(
+                f"Cannot build distributions. A list of dict is expected but a '{type(priors)}' is given.")
 
+        dist_list = []
         for val in priors:
             name = val.pop("name")
             func = val.pop("func")
-            if func == "Normal":
-                dist = pm.Normal(name, **val)
+            if func == "Uniform":
+                if use_dist:
+                    dist = pm.Uniform.dist(**val)
+                else:
+                    dist = pm.Uniform(name, **val)
+            elif func == "Normal":
+                if use_dist:
+                    dist = pm.Normal.dist(**val)
+                else:
+                    dist = pm.Normal(name, **val)
             elif func == "TruncatedNormal":
-                lb = val.get("lower", -np.inf)
-                ub = val.get("upper", np.inf)
-                BoundedDist = pm.Bound(pm.TruncatedNormal, lower=lower, upper=upper)
-                dist = pm.BoundedDist(name, **val)
+                if use_dist:
+                    dist = pm.TruncatedNormal.dist(**val)
+                else:
+                    dist = pm.TruncatedNormal(name, **val)
             elif func == "HalfNormal":
-                dist = pm.HalfNormal(name, **val)
+                if use_dist:
+                    dist = pm.HalfNormal.dist(**val)
+                else:
+                    dist = pm.HalfNormal(name, **val)
             elif func == "HalfCauchy":
-                dist = pm.HalfCauchy(name, **val)
+                if use_dist:
+                    dist = pm.HalfCauchy.dist(**val)
+                else:
+                    dist = pm.HalfCauchy(name, **val)
+            elif func == "Mixture":
+                # k = len(val["dist"])
+                # w = pm.Dirichlet(f"{name}_mixt", a=np.ones(k))  # k mixture weights
+                w = 1.0  # k mixture weights
+                components = []
+                for i, val_i in enumerate(val["dist"]):
+                    val_i["name"] = f"{name}_{i}"  # set a unique name
+                    dist_i = MCSampler._build_distribs([val_i], use_dist=True)
+                    components.append(dist_i[0])
+                dist = pm.Mixture(name, w=w, comp_dists=components)
             else:
                 raise BadRequestException(f"The distribution function '{func}' is unknown")
 

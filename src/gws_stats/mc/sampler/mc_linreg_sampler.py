@@ -6,7 +6,6 @@
 from typing import Type, List
 import pandas as pd
 from pandas import DataFrame
-from pandas.api.types import is_scalar
 
 import arviz as az
 import pymc as pm
