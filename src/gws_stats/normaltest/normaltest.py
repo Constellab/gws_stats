@@ -3,10 +3,9 @@
 # The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
 # About us: https://gencovery.com
 
-import numpy as np
 import pandas
-from gws_core import (BoolParam, ConfigParams, InputSpec, ListParam,
-                      OutputSpec, ParamSet, ResourceSet, StrParam, Table,
+from gws_core import (BoolParam, ConfigParams, InputSpec,
+                      OutputSpec, ParamSet, StrParam, Table,
                       TableUnfolderHelper, Task, TaskInputs, TaskOutputs,
                       resource_decorator, task_decorator)
 from pandas import DataFrame

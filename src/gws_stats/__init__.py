@@ -18,3 +18,7 @@ from .ttests.ttest2sample_ind import TTestTwoIndepSamples
 from .ttests.ttest2sample_rel import TTestTwoRelatedSamples
 # wilcoxon
 from .wilcoxon.wilcoxon import Wilcoxon
+# mc
+from .mc.sampler.mc_sampler import MCSampler
+from .mc.sampler.mc_linreg_sampler import MCLinRegSampler, MCLinRegData
+# from .mc.mc_linreg import MCLinearRegressor
