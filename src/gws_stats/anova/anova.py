@@ -5,9 +5,8 @@
 
 import numpy as np
 import pandas
-from gws_core import (ConfigParams, InputSpec, ListParam, OutputSpec, Table,
-                      Task, TaskInputs, TaskOutputs, resource_decorator,
-                      task_decorator, view)
+from gws_core import (ConfigParams, InputSpec, InputSpecs, OutputSpec,
+                      OutputSpecs, Table, resource_decorator, task_decorator)
 from scipy.stats import f_oneway
 
 from ..base.base_population_stats_result import BasePopulationStatsResult
@@ -97,8 +96,8 @@ class OneWayAnova(BasePopulationStatsTask):
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.f_oneway.html
     """
 
-    input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
-    output_specs = {'result': OutputSpec(OneWayAnovaResult, human_name="Result", short_description="The output result")}
+    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    output_specs = OutputSpecs({'result': OutputSpec(OneWayAnovaResult, human_name="Result", short_description="The output result")})
 
     def compute_stats(self, data, _: ConfigParams):
         """ Compute stats """

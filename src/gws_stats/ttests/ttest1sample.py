@@ -6,9 +6,9 @@
 import numpy as np
 import pandas
 from gws_core import (BoolParam, ConfigParams, FloatParam, InputSpec,
-                      ListParam, OutputSpec, ParamSet, StrParam, Table,
-                      TaskInputs, TaskOutputs, resource_decorator,
-                      task_decorator)
+                      InputSpecs, ListParam, OutputSpec, OutputSpecs, ParamSet,
+                      StrParam, Table, TaskInputs, TaskOutputs,
+                      resource_decorator, task_decorator)
 from scipy.stats import ttest_1samp
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -73,9 +73,9 @@ class TTestOneSample(BasePairwiseStatsTask):
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html
     """
-    input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
-    output_specs = {'result': OutputSpec(TTestOneSampleResult, human_name="Result",
-                                         short_description="The output result")}
+    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    output_specs = OutputSpecs({'result': OutputSpec(TTestOneSampleResult, human_name="Result",
+                                                     short_description="The output result")})
     config_specs = {
         "preselected_column_names":
         ParamSet({

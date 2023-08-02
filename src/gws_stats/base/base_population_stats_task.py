@@ -8,9 +8,10 @@ from abc import abstractmethod
 import numpy as np
 import pandas
 from gws_core import (BadRequestException, BoolParam, ConfigParams, FloatParam,
-                      InputSpec, ListParam, OutputSpec, ParamSet, StrParam,
-                      Table, TableUnfolderHelper, Task, TaskInputs,
-                      TaskOutputs, task_decorator)
+                      InputSpec, InputSpecs, ListParam, OutputSpec,
+                      OutputSpecs, ParamSet, StrParam, Table,
+                      TableUnfolderHelper, Task, TaskInputs, TaskOutputs,
+                      task_decorator)
 from pandas import concat
 from statsmodels.stats.multitest import multipletests
 
@@ -70,9 +71,9 @@ class BasePopulationStatsTask(Task):
     DEFAULT_ADJUST_METHOD = "bonferroni"
     DEFAULT_ADJUST_ALPHA = 0.05
 
-    input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
-    output_specs = {'result': OutputSpec(BasePopulationStatsResult, human_name="Result",
-                                         short_description="The output result")}
+    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    output_specs = OutputSpecs({'result': OutputSpec(BasePopulationStatsResult, human_name="Result",
+                                                     short_description="The output result")})
     config_specs = {
         "preselected_column_names":
         ParamSet({

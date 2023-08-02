@@ -4,8 +4,8 @@
 # About us: https://gencovery.com
 
 import pandas
-from gws_core import (BoolParam, ConfigParams, InputSpec,
-                      OutputSpec, ParamSet, StrParam, Table,
+from gws_core import (BoolParam, ConfigParams, InputSpec, InputSpecs,
+                      OutputSpec, OutputSpecs, ParamSet, StrParam, Table,
                       TableUnfolderHelper, Task, TaskInputs, TaskOutputs,
                       resource_decorator, task_decorator)
 from pandas import DataFrame
@@ -50,9 +50,9 @@ class NormalTest(Task):
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.normaltest.html
     """
-    input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
-    output_specs = {'result': OutputSpec(NormalTestResultTable, human_name="Result",
-                                         short_description="The output result")}
+    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    output_specs = OutputSpecs({'result': OutputSpec(NormalTestResultTable, human_name="Result",
+                                                     short_description="The output result")})
     config_specs = {
         "preselected_column_names":
         ParamSet({

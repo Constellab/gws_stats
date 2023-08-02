@@ -5,9 +5,9 @@
 
 import numpy as np
 import pandas
-from gws_core import (ConfigParams, InputSpec, ListParam, OutputSpec, Table,
-                      Task, TaskInputs, TaskOutputs, resource_decorator,
-                      task_decorator)
+from gws_core import (ConfigParams, InputSpec, InputSpecs, ListParam,
+                      OutputSpec, OutputSpecs, Table, Task, TaskInputs,
+                      TaskOutputs, resource_decorator, task_decorator)
 from scipy.stats import kruskal
 
 from ..base.base_population_stats_result import BasePopulationStatsResult
@@ -97,9 +97,9 @@ class KruskalWallis(BasePopulationStatsTask):
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kruskal.html
     """
 
-    input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
-    output_specs = {'result': OutputSpec(KruskalWallisResult, human_name="Result",
-                                         short_description="The output result")}
+    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    output_specs = OutputSpecs({'result': OutputSpec(KruskalWallisResult, human_name="Result",
+                                                     short_description="The output result")})
 
     def compute_stats(self, data, _: ConfigParams):
         """ Compute stats """

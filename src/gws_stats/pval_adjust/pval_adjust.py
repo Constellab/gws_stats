@@ -6,8 +6,9 @@
 import numpy as np
 import pandas
 from gws_core import (BadRequestException, ConfigParams, FloatParam, InputSpec,
-                      ListParam, OutputSpec, StrParam, Table, Task, TaskInputs,
-                      TaskOutputs, resource_decorator, task_decorator)
+                      InputSpecs, ListParam, OutputSpec, OutputSpecs, StrParam,
+                      Table, Task, TaskInputs, TaskOutputs, resource_decorator,
+                      task_decorator)
 from statsmodels.stats.multitest import multipletests
 
 # *****************************************************************************
@@ -47,9 +48,10 @@ class PValueAdjust(Task):
 
     DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE = 500
 
-    input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table of p-values")}
-    output_specs = {'table': OutputSpec(Table, human_name="Result",
-                                        short_description="The output table containing adjected p-values")}
+    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table",
+                             short_description="The input table of p-values")})
+    output_specs = OutputSpecs({'table': OutputSpec(Table, human_name="Result",
+                                                    short_description="The output table containing adjected p-values")})
     config_specs = {
         "pval_column_name": StrParam(
             default_value=None, optional=True, human_name="PValue column name",

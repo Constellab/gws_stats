@@ -4,9 +4,9 @@
 # About us: https://gencovery.com
 
 import numpy as np
-from gws_core import (ConfigParams, InputSpec, OutputSpec, StrParam, Table,
-                      TaskInputs, TaskOutputs, resource_decorator,
-                      task_decorator)
+from gws_core import (ConfigParams, InputSpec, InputSpecs, OutputSpec,
+                      OutputSpecs, StrParam, Table, TaskInputs, TaskOutputs,
+                      resource_decorator, task_decorator)
 from scipy.stats import spearmanr
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -105,9 +105,9 @@ class SpearmanCorrelation(BasePairwiseStatsTask):
     For more details on the Spearman correlation coefficient, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.spearmanr.htm.
     """
 
-    input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
-    output_specs = {'result': OutputSpec(SpearmanCorrelationResult, human_name="Result",
-                                         short_description="The output result")}
+    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    output_specs = OutputSpecs({'result': OutputSpec(SpearmanCorrelationResult, human_name="Result",
+                                                     short_description="The output result")})
     config_specs = {
         **BasePairwiseStatsTask.config_specs,
     }

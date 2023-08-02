@@ -3,12 +3,12 @@
 # The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
 # About us: https://gencovery.com
 
-from gws_core import (ConfigParams, InputSpec,
-                      OutputSpec, Task, TaskInputs, TaskOutputs,
-                      resource_decorator, task_decorator, Table, ParamSet, StrParam, FloatParam)
-from .sampler.mc_linreg_sampler import MCLinRegSampler, MCLinRegData
+from gws_core import (ConfigParams, FloatParam, InputSpec, OutputSpec,
+                      ParamSet, StrParam, Table, Task, TaskInputs, TaskOutputs,
+                      resource_decorator, task_decorator)
 
 from ..base.helper.simple_design_helper import SimpleDesignHelper
+from .sampler.mc_linreg_sampler import MCLinRegData, MCLinRegSampler
 
 # *****************************************************************************
 #
@@ -45,9 +45,9 @@ class MCLinearRegressor(Task):
     See also https://www.pymc.io/projects/examples/en/latest/generalized_linear_models/GLM-robust.html
     """
 
-    input_specs = {'table': InputSpec(Table, human_name="Table", short_description="The input table")}
-    output_specs = {'result': OutputSpec(MCLinearRegressorTable, human_name="result",
-                                         short_description="The output result")}
+    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    output_specs = OutputSpecs({'result': OutputSpec(MCLinearRegressorTable, human_name="result",
+                                                     short_description="The output result")})
     config_specs = {
         'training_design': SimpleDesignHelper.create_training_design_param_set(),
         # 'intercept': ParamSet({
