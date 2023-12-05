@@ -1,7 +1,6 @@
 import os
 
-from gws_core import (BaseTestCase, ConfigParams, DatasetImporter, File, GTest,
-                      Settings, Table, TableImporter, TaskRunner, ViewTester)
+from gws_core import BaseTestCase, File, Settings, TableImporter, TaskRunner
 from gws_core.extra import DataProvider
 from gws_stats import OneWayAnova
 
