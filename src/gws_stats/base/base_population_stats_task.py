@@ -122,7 +122,7 @@ class BasePopulationStatsTask(Task):
         else:
             stat_result = self._column_compare(table, params)
 
-        t = self.output_specs["result"].get_default_resource_type()
+        t = self.output_specs.get_spec("result").get_default_resource_type()
         result = t(result=stat_result, input_table=table)
         return {'result': result}
 

@@ -151,7 +151,7 @@ class BasePairwiseStatsTask(Task):
         # adjust pvalue
         all_result_dict = self._adjust_pvals(all_result, is_group_comparison, params)
 
-        t = self.output_specs["result"].get_default_resource_type()
+        t = self.output_specs.get_spec("result").get_default_resource_type()
         result = t(result=all_result_dict, input_table=table)
         return {'result': result}
 
