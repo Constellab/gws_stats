@@ -157,7 +157,7 @@ class BasePopulationStatsTask(Task):
         all_stat_result = None
         for k in range(0, data.shape[1]):
             # select each column separately to compare them
-            sub_table = table.select_by_column_positions([k])
+            sub_table = table.select_by_column_indexes([k])
             # unfold the current column
             sub_table = TableUnfolderHelper.unfold_rows_by_tags(sub_table, [key], 'column_name')
 
