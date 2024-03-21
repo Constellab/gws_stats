@@ -1,7 +1,7 @@
 {
   "name": "gws_stats",
   "author_email": "admin@gencovery.com",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Gencovery brick for basic statistical analysis",
   "variables": {
     "gws_stats:testdata_dir": "${CURRENT_DIR}/tests/testdata"
