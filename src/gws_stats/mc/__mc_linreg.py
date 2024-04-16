@@ -1,7 +1,3 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 from gws_core import (ConfigParams, FloatParam, InputSpec, OutputSpec,
                       ParamSet, StrParam, Table, Task, TaskInputs, TaskOutputs,
@@ -45,7 +41,8 @@ class MCLinearRegressor(Task):
     See also https://www.pymc.io/projects/examples/en/latest/generalized_linear_models/GLM-robust.html
     """
 
-    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    input_specs = InputSpecs({'table': InputSpec(
+        Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(MCLinearRegressorTable, human_name="result",
                                                      short_description="The output result")})
     config_specs = {
@@ -74,7 +71,8 @@ class MCLinearRegressor(Task):
         table = inputs["table"]
         training_design = params["training_design"]
 
-        x_true, y_true = SimpleDesignHelper.create_training_matrices(table, training_design)
+        x_true, y_true = SimpleDesignHelper.create_training_matrices(
+            table, training_design)
         data = MCLinRegData(x_data=x_true, y_data=y_true)
         sampler = MCLinRegSampler()
         sampler.set_data(data)
@@ -84,9 +82,12 @@ class MCLinearRegressor(Task):
         intercept = params["intercept"]
         slope = params["slope"]
         sigma = params["sigma"]
-        sampler.set_intercept_priors(intercept["func"], self._parse_params(intercept["params"]))
-        sampler.set_slope_priors(slope["func"], self._parse_params(slope["params"]))
-        sampler.set_sigma_prior(sigma["func"], self._parse_params(sigma["params"]))
+        sampler.set_intercept_priors(
+            intercept["func"], self._parse_params(intercept["params"]))
+        sampler.set_slope_priors(
+            slope["func"], self._parse_params(slope["params"]))
+        sampler.set_sigma_prior(
+            sigma["func"], self._parse_params(sigma["params"]))
 
         result = sampler.sample()
 

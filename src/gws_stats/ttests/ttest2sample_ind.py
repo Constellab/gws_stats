@@ -1,7 +1,3 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 import numpy as np
 import pandas
@@ -103,7 +99,8 @@ class TTestTwoIndepSamples(BasePairwiseStatsTask):
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html
     """
-    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    input_specs = InputSpecs({'table': InputSpec(
+        Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(TTestTwoIndepSamplesResult,
                                                      human_name="Result", short_description="The output result")})
     config_specs = {
@@ -113,7 +110,8 @@ class TTestTwoIndepSamples(BasePairwiseStatsTask):
             default_value=True, human_name="Equal variance",
             short_description="Set True to assume that the populations have equal variance; False otherwise"),
         "alternative_hypothesis": StrParam(default_value="two-sided",
-                                           allowed_values=["two-sided", "less", "greater"],
+                                           allowed_values=[
+                                               "two-sided", "less", "greater"],
                                            human_name="Alternative hypothesis",
                                            short_description="The alternative hypothesis chosen for the testing.")
     }
@@ -122,6 +120,8 @@ class TTestTwoIndepSamples(BasePairwiseStatsTask):
     def compute_stats(self, current_data, ref_col, target_col, params: ConfigParams):
         equal_var = params.get_value("equal_variance")
         alternative = params.get_value("alternative_hypothesis")
-        stat_result = ttest_ind(*current_data, nan_policy='omit', alternative=alternative, equal_var=equal_var)
-        stat_result = [ref_col, target_col, stat_result.statistic, stat_result.pvalue]
+        stat_result = ttest_ind(
+            *current_data, nan_policy='omit', alternative=alternative, equal_var=equal_var)
+        stat_result = [ref_col, target_col,
+                       stat_result.statistic, stat_result.pvalue]
         return stat_result

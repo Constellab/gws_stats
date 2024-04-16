@@ -1,7 +1,3 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 from abc import abstractmethod
 
@@ -71,7 +67,8 @@ class BasePopulationStatsTask(Task):
     DEFAULT_ADJUST_METHOD = "bonferroni"
     DEFAULT_ADJUST_ALPHA = 0.05
 
-    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    input_specs = InputSpecs({'table': InputSpec(
+        Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(BasePopulationStatsResult, human_name="Result",
                                                      short_description="The output result")})
     config_specs = {
@@ -140,9 +137,11 @@ class BasePopulationStatsTask(Task):
         array_has_nan = data.isnull().sum().sum()
         data = data.to_numpy().T
         if array_has_nan:
-            data = [[x for x in y if not np.isnan(x)] for y in data]  # remove nan values
+            # remove nan values
+            data = [[x for x in y if not np.isnan(x)] for y in data]
             if not self._is_nan_warning_shown:
-                self.log_warning_message("Data contain NaN values. NaN values are omitted.")
+                self.log_warning_message(
+                    "Data contain NaN values. NaN values are omitted.")
                 self._is_nan_warning_shown = True
 
         stat_result = self.compute_stats(data, params)
@@ -159,7 +158,8 @@ class BasePopulationStatsTask(Task):
             # select each column separately to compare them
             sub_table = table.select_by_column_indexes([k])
             # unfold the current column
-            sub_table = TableUnfolderHelper.unfold_rows_by_tags(sub_table, [key], 'column_name')
+            sub_table = TableUnfolderHelper.unfold_rows_by_tags(
+                sub_table, [key], 'column_name')
 
             sub_data = sub_table.get_data()
             sub_data = sub_data.apply(pandas.to_numeric, errors='coerce')
@@ -167,20 +167,26 @@ class BasePopulationStatsTask(Task):
             array_sum = np.sum(sub_data)
             array_has_nan = np.isnan(array_sum)
             if array_has_nan:
-                sub_data = [[x for x in y if not np.isnan(x)] for y in sub_data]  # remove nan values
+                # remove nan values
+                sub_data = [
+                    [x for x in y if not np.isnan(x)] for y in sub_data]
                 if not self._is_nan_warning_shown:
-                    self.log_warning_message("Data contain NaN values. NaN values are omitted.")
+                    self.log_warning_message(
+                        "Data contain NaN values. NaN values are omitted.")
                     self._is_nan_warning_shown = True
 
             # compare all the unfolded columns
             stat_result = self.compute_stats(sub_data, params)
             if all_stat_result is None:
-                stat_result = [data.columns[k], stat_result.statistic, stat_result.pvalue]
+                stat_result = [data.columns[k],
+                               stat_result.statistic, stat_result.pvalue]
                 all_stat_result = pandas.DataFrame([stat_result])
             else:
-                stat_result = [data.columns[k], stat_result.statistic, stat_result.pvalue]
+                stat_result = [data.columns[k],
+                               stat_result.statistic, stat_result.pvalue]
                 stat_result = pandas.DataFrame([stat_result])
-                all_stat_result = pandas.concat([all_stat_result, stat_result], axis=0, ignore_index=True)
+                all_stat_result = pandas.concat(
+                    [all_stat_result, stat_result], axis=0, ignore_index=True)
 
         # adjust pvalue
         paraset = params.get_value("adjust_pvalue", [])
@@ -188,8 +194,10 @@ class BasePopulationStatsTask(Task):
             adjust_method = self.DEFAULT_ADJUST_METHOD
             adjust_alpha = self.DEFAULT_ADJUST_ALPHA
         else:
-            adjust_method = paraset[0].get("method", self.DEFAULT_ADJUST_METHOD)
+            adjust_method = paraset[0].get(
+                "method", self.DEFAULT_ADJUST_METHOD)
             adjust_alpha = paraset[0].get("alpha", self.DEFAULT_ADJUST_ALPHA)
-        all_stat_result = self._do_adjust_pvals(all_stat_result, adjust_method, adjust_alpha)
+        all_stat_result = self._do_adjust_pvals(
+            all_stat_result, adjust_method, adjust_alpha)
 
         return all_stat_result

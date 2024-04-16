@@ -1,11 +1,8 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 import numpy as np
 from gws_core import (ResourceRField, ResourceSet, RField, Table,
                       resource_decorator)
+
 
 @resource_decorator("BaseResource", hide=True)
 class BaseResource(ResourceSet):

@@ -1,7 +1,3 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 import numpy as np
 import pandas
@@ -58,7 +54,8 @@ class PValueAdjust(Task):
             short_description="The name of the column containing p-values. If not given, the columns with values between 0 and 1 are supposed to contain p-values."),
         "method": StrParam(
             default_value="bonferroni", human_name="Correction method",
-            allowed_values=["bonferroni", "fdr_bh", "fdr_by", "fdr_tsbh", "fdr_tsbky", "sidak", "holm-sidak", "holm", "simes-hochberg", "hommel"],
+            allowed_values=["bonferroni", "fdr_bh", "fdr_by", "fdr_tsbh",
+                            "fdr_tsbky", "sidak", "holm-sidak", "holm", "simes-hochberg", "hommel"],
             short_description="The method used to adjust (correct) p-values"),
         "alpha": FloatParam(
             default_value=0.05, min_value=0, max_value=1, human_name="Alpha",
@@ -85,11 +82,13 @@ class PValueAdjust(Task):
                 if isinstance(target_col_index, int):
                     target_col_index = [target_col_index]
             else:
-                raise BadRequestException(f"The column name '{target_col_name}' does not exist")
+                raise BadRequestException(
+                    f"The column name '{target_col_name}' does not exist")
         else:
             self.log_info_message(
                 f"No column names given. The first {self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used.")
-            target_col_index = range(0, min(self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE, data.shape[1]))
+            target_col_index = range(
+                0, min(self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE, data.shape[1]))
 
         all_result = None
         for i in target_col_index:
@@ -106,13 +105,17 @@ class PValueAdjust(Task):
             stat_result = self.compute_stats(current_data, params)
 
             if all_result is None:
-                all_result = pandas.DataFrame(stat_result, columns=["Adjusted_"+target_col_name])
+                all_result = pandas.DataFrame(
+                    stat_result, columns=["Adjusted_"+target_col_name])
             else:
-                df = pandas.DataFrame(stat_result, columns=["Adjusted_"+target_col_name])
-                all_result = pandas.concat([all_result, df], axis=0, ignore_index=True)
+                df = pandas.DataFrame(stat_result, columns=[
+                                      "Adjusted_"+target_col_name])
+                all_result = pandas.concat(
+                    [all_result, df], axis=0, ignore_index=True)
 
         if all_result is None:
-            raise BadRequestException("No valid p-value found. Please ensure that values are between 0 and 1.")
+            raise BadRequestException(
+                "No valid p-value found. Please ensure that values are between 0 and 1.")
 
         all_result.index = table.get_data().index
         all_result = pandas.concat([table.get_data(), all_result], axis=1)

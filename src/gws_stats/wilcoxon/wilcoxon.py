@@ -1,7 +1,3 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 import numpy as np
 from gws_core import (BoolParam, ConfigParams, InputSpec, InputSpecs,
@@ -113,7 +109,8 @@ class Wilcoxon(BasePairwiseStatsTask):
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.wilcoxon.html
     """
-    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    input_specs = InputSpecs({'table': InputSpec(
+        Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(
         WilcoxonResult, human_name="Result", short_description="The output result")})
     config_specs = {
@@ -123,7 +120,8 @@ class Wilcoxon(BasePairwiseStatsTask):
                                 human_name="Method for zero differences treatment",
                                 short_description="Method chosen to include or not zero differences and their ranking"),
         "alternative_hypothesis": StrParam(default_value="two-sided",
-                                           allowed_values=["two-sided", "less", "greater"],
+                                           allowed_values=[
+                                               "two-sided", "less", "greater"],
                                            human_name="Alternative hypothesis",
                                            short_description="The alternative hypothesis chosen for the testing."),
         "mode": StrParam(default_value="auto",
@@ -136,6 +134,8 @@ class Wilcoxon(BasePairwiseStatsTask):
         mode = params.get_value("mode")
         zero_method = params.get_value("zero_method")
         alternative = params.get_value("alternative_hypothesis")
-        stat_result = wilcoxon(*current_data, zero_method=zero_method, alternative=alternative, mode=mode)
-        stat_result = [ref_col, target_col, stat_result.statistic, stat_result.pvalue]
+        stat_result = wilcoxon(
+            *current_data, zero_method=zero_method, alternative=alternative, mode=mode)
+        stat_result = [ref_col, target_col,
+                       stat_result.statistic, stat_result.pvalue]
         return stat_result

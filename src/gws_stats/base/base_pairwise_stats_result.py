@@ -1,7 +1,3 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 from typing import Dict
 
@@ -101,21 +97,28 @@ class BasePairwiseStatsResult(BaseResource):
                 cdata.at[col1, col2] = stats_data.loc[index, self.PVALUE_NAME]
                 cdata.at[col2, col1] = stats_data.loc[index, self.PVALUE_NAME]
             elif metric.lower() == self.ADJUSTED_PVALUE_NAME.lower():
-                cdata.at[col1, col2] = stats_data.loc[index, self.ADJUSTED_PVALUE_NAME]
-                cdata.at[col2, col1] = stats_data.loc[index, self.ADJUSTED_PVALUE_NAME]
+                cdata.at[col1, col2] = stats_data.loc[index,
+                                                      self.ADJUSTED_PVALUE_NAME]
+                cdata.at[col2, col1] = stats_data.loc[index,
+                                                      self.ADJUSTED_PVALUE_NAME]
             elif metric.lower() == self.STATISTICS_NAME.lower():
-                cdata.at[col1, col2] = stats_data.loc[index, self.STATISTICS_NAME]
-                cdata.at[col2, col1] = stats_data.loc[index, self.STATISTICS_NAME]
+                cdata.at[col1, col2] = stats_data.loc[index,
+                                                      self.STATISTICS_NAME]
+                cdata.at[col2, col1] = stats_data.loc[index,
+                                                      self.STATISTICS_NAME]
             else:
-                raise BadRequestException(f"Cannot create contingency table. Invalid metric '{metric}'.")
+                raise BadRequestException(
+                    f"Cannot create contingency table. Invalid metric '{metric}'.")
 
         for i in range(0, cdata.shape[0]):
             for j in range(i, cdata.shape[0]):
                 cdata.iloc[j, i] = np.nan
 
         # remove
-        ref_columns = sorted(list(set(stats_data.loc[:, self.REFERENCE_NAME].values.tolist())))
-        comp_columns = sorted(list(set(stats_data.loc[:, self.COMPARED_NAME].values.tolist())))
+        ref_columns = sorted(
+            list(set(stats_data.loc[:, self.REFERENCE_NAME].values.tolist())))
+        comp_columns = sorted(
+            list(set(stats_data.loc[:, self.COMPARED_NAME].values.tolist())))
         cdata = cdata.loc[ref_columns, comp_columns]
 
         table = Table(cdata)
@@ -127,7 +130,8 @@ class BasePairwiseStatsResult(BaseResource):
         elif metric.lower() == self.STATISTICS_NAME.lower():
             table.name = self.STATISTICS_CONTINGENCY_TABLE_NAME
         else:
-            raise BadRequestException(f"Cannot create contingency table. Invalid metric '{metric}'.")
+            raise BadRequestException(
+                f"Cannot create contingency table. Invalid metric '{metric}'.")
         self.add_resource(table)
 
     def get_contingency_table(self, metric):
@@ -139,5 +143,6 @@ class BasePairwiseStatsResult(BaseResource):
         elif metric.lower() == self.STATISTICS_NAME.lower():
             name = self.STATISTICS_CONTINGENCY_TABLE_NAME
         else:
-            raise BadRequestException(f"Cannot find contingency table. Invalid metric '{metric}'.")
+            raise BadRequestException(
+                f"Cannot find contingency table. Invalid metric '{metric}'.")
         return self.get_resource(name)

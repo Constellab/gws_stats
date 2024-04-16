@@ -1,7 +1,3 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 import numpy as np
 import pandas
@@ -103,13 +99,15 @@ class TTestTwoRelatedSamples(BasePairwiseStatsTask):
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_rel.html
     """
-    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    input_specs = InputSpecs({'table': InputSpec(
+        Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(TTestTwoRelatedSamplesResult,
                                                      human_name="Result", short_description="The output result")})
     config_specs = {
         **BasePairwiseStatsTask.config_specs,
         "alternative_hypothesis": StrParam(default_value="two-sided",
-                                           allowed_values=["two-sided", "less", "greater"],
+                                           allowed_values=[
+                                               "two-sided", "less", "greater"],
                                            human_name="Alternative hypothesis",
                                            short_description="The alternative hypothesis chosen for the testing")
     }
@@ -117,6 +115,8 @@ class TTestTwoRelatedSamples(BasePairwiseStatsTask):
 
     def compute_stats(self, current_data, ref_col, target_col, params: ConfigParams):
         alternative = params.get_value("alternative_hypothesis")
-        stat_result = ttest_rel(*current_data, nan_policy='omit', alternative=alternative)
-        stat_result = [ref_col, target_col, stat_result.statistic, stat_result.pvalue]
+        stat_result = ttest_rel(
+            *current_data, nan_policy='omit', alternative=alternative)
+        stat_result = [ref_col, target_col,
+                       stat_result.statistic, stat_result.pvalue]
         return stat_result

@@ -1,13 +1,10 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 import numpy as np
 import pandas
 from gws_core import BoolParam, ParamSet, StrParam, Table
 from pandas import DataFrame
 from pandas.api.types import is_string_dtype
+
 from .base_design_helper import BaseDesignHelper
 
 
@@ -46,10 +43,12 @@ class SimpleDesignHelper(BaseDesignHelper):
                 targets = [tag[key] for tag in tags]
                 # labels = sorted(list(set(targets)))
                 if dummy:
-                    y_temp: DataFrame = cls.convert_labels_to_dummy_matrix(targets, index=training_set.row_names)
+                    y_temp: DataFrame = cls.convert_labels_to_dummy_matrix(
+                        targets, index=training_set.row_names)
                 else:
                     # y_temp: DataFrame = DataFrame(data=targets, index=training_set.row_names, columns=key)
-                    y_temp = cls.convert_labels_to_numeric_matrix(targets, index=training_set.row_names, columns=key)
+                    y_temp = cls.convert_labels_to_numeric_matrix(
+                        targets, index=training_set.row_names, columns=key)
             else:
                 colname = design_target["target_name"]
                 y_temp: DataFrame = training_set.select_by_column_names(
@@ -66,7 +65,8 @@ class SimpleDesignHelper(BaseDesignHelper):
                 if target_type == cls.CATEGROICAL_TYPE:
                     y_temp = [str(k) for k in y_temp.squeeze().values]
                     if dummy:
-                        y_temp = cls.convert_labels_to_dummy_matrix(labels=y_temp, index=training_set.row_names)
+                        y_temp = cls.convert_labels_to_dummy_matrix(
+                            labels=y_temp, index=training_set.row_names)
                     else:
                         y_temp = cls.convert_labels_to_numeric_matrix(
                             labels=y_temp, index=training_set.row_names, columns=colname)

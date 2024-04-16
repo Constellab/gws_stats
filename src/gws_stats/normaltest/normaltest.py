@@ -1,7 +1,3 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 import pandas
 from gws_core import (BoolParam, ConfigParams, InputSpec, InputSpecs,
@@ -50,7 +46,8 @@ class NormalTest(Task):
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.normaltest.html
     """
-    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    input_specs = InputSpecs({'table': InputSpec(
+        Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(NormalTestResultTable, human_name="Result",
                                                      short_description="The output result")})
     config_specs = {
@@ -90,7 +87,8 @@ class NormalTest(Task):
         data = data.apply(pandas.to_numeric, errors='coerce')
         array_has_nan = data.isnull().sum().sum()
         if array_has_nan:
-            self.log_warning_message("Data contain NaN values. NaN values are omitted.")
+            self.log_warning_message(
+                "Data contain NaN values. NaN values are omitted.")
 
         k2, pval = normaltest(data.to_numpy(), nan_policy='omit')
         k2 = DataFrame(k2)
@@ -101,8 +99,10 @@ class NormalTest(Task):
         mean.index = k2.index
         std.index = k2.index
         cols.index = k2.index
-        result_data = pandas.concat([cols, k2, pval, mean, std], axis=1, ignore_index=True)
-        result_data.columns = ["Columns", "Statistics", "PValue", "Mean", "Std"]
+        result_data = pandas.concat(
+            [cols, k2, pval, mean, std], axis=1, ignore_index=True)
+        result_data.columns = ["Columns",
+                               "Statistics", "PValue", "Mean", "Std"]
         return result_data
 
     def _row_group_test(self, table, params):
@@ -114,12 +114,14 @@ class NormalTest(Task):
             # select each column separately to compare them
             sub_table = table.select_by_column_positions([k])
             # unfold the current column
-            sub_table = TableUnfolderHelper.unfold_rows_by_tags(sub_table, [key], 'column_name')
+            sub_table = TableUnfolderHelper.unfold_rows_by_tags(
+                sub_table, [key], 'column_name')
             # compare all the unfolded columns
             result_data = self._column_test(sub_table)
             if all_result_data is None:
                 all_result_data = result_data
             else:
-                all_result_data = pandas.concat([all_result_data, result_data], axis=0, ignore_index=True)
+                all_result_data = pandas.concat(
+                    [all_result_data, result_data], axis=0, ignore_index=True)
 
         return all_result_data

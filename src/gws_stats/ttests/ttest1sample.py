@@ -1,7 +1,3 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 import numpy as np
 import pandas
@@ -73,7 +69,8 @@ class TTestOneSample(BasePairwiseStatsTask):
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html
     """
-    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    input_specs = InputSpecs({'table': InputSpec(
+        Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(TTestOneSampleResult, human_name="Result",
                                                      short_description="The output result")})
     config_specs = {
@@ -91,7 +88,8 @@ class TTestOneSample(BasePairwiseStatsTask):
         #     short_description=f"The names of the columns to test against the expected value. By default, the first {BasePairwiseStatsTask.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used"),
         'expected_value': FloatParam(default_value=0.0, human_name="Expected value", short_description="The expected value in null hypothesis"),
         "alternative_hypothesis": StrParam(default_value="two-sided",
-                                           allowed_values=["two-sided", "less", "greater"],
+                                           allowed_values=[
+                                               "two-sided", "less", "greater"],
                                            human_name="Alternative hypothesis",
                                            short_description="The alternative hypothesis chosen for the testing."),
         "adjust_pvalue":
@@ -111,8 +109,10 @@ class TTestOneSample(BasePairwiseStatsTask):
         """ compute stats """
         exp_val = params.get_value("expected_value")
         alternative = params.get_value("alternative_hypothesis")
-        stat_result = ttest_1samp(*current_data, popmean=exp_val, alternative=alternative, nan_policy='omit')
-        stat_result = [f"ExpectedValue = {exp_val}", target_col, stat_result.statistic, stat_result.pvalue]
+        stat_result = ttest_1samp(
+            *current_data, popmean=exp_val, alternative=alternative, nan_policy='omit')
+        stat_result = [
+            f"ExpectedValue = {exp_val}", target_col, stat_result.statistic, stat_result.pvalue]
         return stat_result
 
     def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
@@ -135,9 +135,11 @@ class TTestOneSample(BasePairwiseStatsTask):
             array_sum = np.sum(current_data)
             array_has_nan = np.isnan(array_sum)
             if array_has_nan:
-                current_data = [[x for x in y if not np.isnan(x)] for y in current_data]
+                current_data = [
+                    [x for x in y if not np.isnan(x)] for y in current_data]
                 if not is_nan_log_shown:
-                    self.log_warning_message("Data contain NaN values. NaN values are omitted.")
+                    self.log_warning_message(
+                        "Data contain NaN values. NaN values are omitted.")
                     is_nan_log_shown = True
 
             stat_result = self.compute_stats(current_data, target_col, params)
@@ -146,7 +148,8 @@ class TTestOneSample(BasePairwiseStatsTask):
                 all_result = pandas.DataFrame([stat_result])
             else:
                 df = pandas.DataFrame([stat_result])
-                all_result = pandas.concat([all_result, df], axis=0, ignore_index=True)
+                all_result = pandas.concat(
+                    [all_result, df], axis=0, ignore_index=True)
 
         # adjust pvalue
         all_result_dict = self._adjust_pvals(all_result, False, params)

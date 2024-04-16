@@ -1,7 +1,3 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 from abc import abstractmethod
 
@@ -83,7 +79,8 @@ class BasePairwiseStatsTask(Task):
     DEFAULT_ADJUST_METHOD = "bonferroni"
     DEFAULT_ADJUST_ALPHA = 0.05
 
-    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    input_specs = InputSpecs({'table': InputSpec(
+        Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(BasePairwiseStatsResult, human_name="Result",
                                                      short_description="The output result")})
     config_specs = {
@@ -147,9 +144,11 @@ class BasePairwiseStatsTask(Task):
             all_result = self._column_wise_compare(table, params)
 
         if all_result is None:
-            raise BadRequestException("The final result table seems empty. Please check pre-selected column names.")
+            raise BadRequestException(
+                "The final result table seems empty. Please check pre-selected column names.")
         # adjust pvalue
-        all_result_dict = self._adjust_pvals(all_result, is_group_comparison, params)
+        all_result_dict = self._adjust_pvals(
+            all_result, is_group_comparison, params)
 
         t = self.output_specs.get_spec("result").get_default_resource_type()
         result = t(result=all_result_dict, input_table=table)
@@ -162,7 +161,8 @@ class BasePairwiseStatsTask(Task):
             adjust_method = self.DEFAULT_ADJUST_METHOD
             adjust_alpha = self.DEFAULT_ADJUST_ALPHA
         else:
-            adjust_method = paraset[0].get("method", self.DEFAULT_ADJUST_METHOD)
+            adjust_method = paraset[0].get(
+                "method", self.DEFAULT_ADJUST_METHOD)
             adjust_alpha = paraset[0].get("alpha", self.DEFAULT_ADJUST_ALPHA)
 
         all_result_dict = {}
@@ -171,26 +171,33 @@ class BasePairwiseStatsTask(Task):
                 *all_result.iloc[:, 0].to_list(),
                 *all_result.iloc[:, 1].to_list()
             ]
-            groups = list(set([name.split("_")[-1] for name in comparison_list]))
+            groups = list(set([name.split("_")[-1]
+                          for name in comparison_list]))
             for i, grp1 in enumerate(groups):
                 for j, grp2 in enumerate(groups):
                     if j <= i:
                         continue
-                    all_result_grp = self._select_comparisons_by_groups(all_result, grp1, grp2)
-                    all_result_grp = self._do_adjust_pvals(all_result_grp, adjust_method, adjust_alpha)
+                    all_result_grp = self._select_comparisons_by_groups(
+                        all_result, grp1, grp2)
+                    all_result_grp = self._do_adjust_pvals(
+                        all_result_grp, adjust_method, adjust_alpha)
                     all_result_dict[f"{grp1}_{grp2}"] = all_result_grp
 
-            all_result_dict["full"] = pandas.concat(all_result_dict.values(), axis=0, ignore_index=True)
+            all_result_dict["full"] = pandas.concat(
+                all_result_dict.values(), axis=0, ignore_index=True)
         else:
-            all_result_dict["full"] = self._do_adjust_pvals(all_result, adjust_method, adjust_alpha)
+            all_result_dict["full"] = self._do_adjust_pvals(
+                all_result, adjust_method, adjust_alpha)
 
         return all_result_dict
 
     def _select_comparisons_by_groups(self, all_result, grp1, grp2):
         col1 = all_result.iloc[:, 0]
         col2 = all_result.iloc[:, 1]
-        cond1 = (col1.str.endswith(f"_{grp1}")) & (col2.str.endswith(f"_{grp2}"))
-        cond2 = (col1.str.endswith(f"_{grp2}")) & (col2.str.endswith(f"_{grp1}"))
+        cond1 = (col1.str.endswith(f"_{grp1}")) & (
+            col2.str.endswith(f"_{grp2}"))
+        cond2 = (col1.str.endswith(f"_{grp2}")) & (
+            col2.str.endswith(f"_{grp1}"))
         all_result_grp = all_result[cond1 | cond2]
         return all_result_grp
 
@@ -219,9 +226,11 @@ class BasePairwiseStatsTask(Task):
             if reference_column in data.columns:
                 reference_columns = [reference_column]
             else:
-                raise BadRequestException(f"The reference column {reference_column} name is not found")
+                raise BadRequestException(
+                    f"The reference column {reference_column} name is not found")
         else:
-            reference_columns = list(set(table.column_names[0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]))
+            reference_columns = list(
+                set(table.column_names[0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]))
 
         all_result = self._do_comparisons(data, params, reference_columns)
         return all_result
@@ -231,7 +240,8 @@ class BasePairwiseStatsTask(Task):
         if selected_cols:
             table = table.select_by_column_names(selected_cols)
         if table.nb_columns == 0:
-            raise BadRequestException("The pre-selected table is empty. Please check pre-selected column name.")
+            raise BadRequestException(
+                "The pre-selected table is empty. Please check pre-selected column name.")
 
         key = params.get_value("row_tag_key")
         data = table.get_data()
@@ -239,16 +249,21 @@ class BasePairwiseStatsTask(Task):
         all_result = None
         for k in range(0, data.shape[1]):
             # select each column separately to compare them
-            sub_table =table.select_by_column_indexes([k])
+            sub_table = table.select_by_column_indexes([k])
             # unfold the current column
-            sub_table = TableUnfolderHelper.unfold_rows_by_tags(sub_table, [key], 'column_name')
+            sub_table = TableUnfolderHelper.unfold_rows_by_tags(
+                sub_table, [key], 'column_name')
             # compare all the unfolded columns
-            reference_columns = list(set(sub_table.column_names[0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]))
+            reference_columns = list(
+                set(sub_table.column_names[0:self.DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE]))
             if all_result is None:
-                all_result = self._do_comparisons(sub_table.get_data(), params, reference_columns)
+                all_result = self._do_comparisons(
+                    sub_table.get_data(), params, reference_columns)
             else:
-                df = self._do_comparisons(sub_table.get_data(), params, reference_columns)
-                all_result = pandas.concat([all_result, df], axis=0, ignore_index=True)
+                df = self._do_comparisons(
+                    sub_table.get_data(), params, reference_columns)
+                all_result = pandas.concat(
+                    [all_result, df], axis=0, ignore_index=True)
 
         return all_result
 
@@ -282,21 +297,26 @@ class BasePairwiseStatsTask(Task):
                     [ref_data, target_data],
                     axis=1
                 )
-                current_data = current_data.apply(pandas.to_numeric, errors='coerce')
+                current_data = current_data.apply(
+                    pandas.to_numeric, errors='coerce')
                 current_data = current_data.to_numpy().T
                 array_sum = np.sum(current_data)
                 array_has_nan = np.isnan(array_sum)
                 if array_has_nan:
                     if self._remove_nan_before_compute:
-                        current_data = [[x for x in y if not np.isnan(x)] for y in current_data]
+                        current_data = [
+                            [x for x in y if not np.isnan(x)] for y in current_data]
                     if not self._is_nan_warning_shown:
-                        self.log_warning_message("Data contain NaN values. NaN values are omitted.")
+                        self.log_warning_message(
+                            "Data contain NaN values. NaN values are omitted.")
                         self._is_nan_warning_shown = True
 
-                stat_result = self.compute_stats(current_data, ref_col, target_col, params)
+                stat_result = self.compute_stats(
+                    current_data, ref_col, target_col, params)
                 if all_result is None:
                     all_result = pandas.DataFrame([stat_result])
                 else:
                     df = pandas.DataFrame([stat_result])
-                    all_result = pandas.concat([all_result, df], axis=0, ignore_index=True)
+                    all_result = pandas.concat(
+                        [all_result, df], axis=0, ignore_index=True)
         return all_result

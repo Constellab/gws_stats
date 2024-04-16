@@ -1,7 +1,3 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 import numpy as np
 from gws_core import (ConfigParams, InputSpec, InputSpecs, OutputSpec,
@@ -115,7 +111,8 @@ class MannWhitney(BasePairwiseStatsTask):
 
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.mannwhitneyu.html
     """
-    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
+    input_specs = InputSpecs({'table': InputSpec(
+        Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(
         MannWhitneyResult, human_name="Result", short_description="The output result")})
     config_specs = {
@@ -135,6 +132,8 @@ class MannWhitney(BasePairwiseStatsTask):
     def compute_stats(self, current_data, ref_col, target_col, params: ConfigParams):
         method = params.get_value("method")
         alternative = params.get_value("alternative_hypothesis")
-        stat_result = mannwhitneyu(*current_data, method=method, alternative=alternative)
-        stat_result = [ref_col, target_col, stat_result.statistic, stat_result.pvalue]
+        stat_result = mannwhitneyu(
+            *current_data, method=method, alternative=alternative)
+        stat_result = [ref_col, target_col,
+                       stat_result.statistic, stat_result.pvalue]
         return stat_result

@@ -1,7 +1,3 @@
-# LICENSE
-# This software is the exclusive property of Gencovery SAS.
-# The use and distribution of this software is prohibited without the prior consent of Gencovery SAS.
-# About us: https://gencovery.com
 
 import numpy as np
 import pandas
@@ -96,8 +92,10 @@ class OneWayAnova(BasePopulationStatsTask):
     For more details, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.f_oneway.html
     """
 
-    input_specs = InputSpecs({'table': InputSpec(Table, human_name="Table", short_description="The input table")})
-    output_specs = OutputSpecs({'result': OutputSpec(OneWayAnovaResult, human_name="Result", short_description="The output result")})
+    input_specs = InputSpecs({'table': InputSpec(
+        Table, human_name="Table", short_description="The input table")})
+    output_specs = OutputSpecs({'result': OutputSpec(
+        OneWayAnovaResult, human_name="Result", short_description="The output result")})
 
     def compute_stats(self, data, _: ConfigParams):
         """ Compute stats """
