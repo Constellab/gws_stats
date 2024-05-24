@@ -1,10 +1,11 @@
 import os
 
-from gws_core import BaseTestCase, File, Settings, TableImporter, TaskRunner
+from gws_core import (BaseTestCaseLight, File, Settings, TableImporter,
+                      TaskRunner)
 from gws_stats import PearsonCorrelation, PValueAdjust
 
 
-class TestPValueAdjust(BaseTestCase):
+class TestPValueAdjust(BaseTestCaseLight):
 
     def test_process(self):
         settings = Settings.get_instance()

@@ -1,12 +1,11 @@
 
-from gws_core import BaseTestCase
-from gws_stats import MCLinRegSampler, MCLinRegData
-from pandas import DataFrame
 import arviz as az
-import numpy as np
+from gws_core import BaseTestCaseLight
+from gws_stats import MCLinRegData, MCLinRegSampler
+from pandas import DataFrame
 
 
-class TestMCSampler(BaseTestCase):
+class TestMCSampler(BaseTestCaseLight):
 
     def test_mc_sampler(self):
         sampler = MCLinRegSampler()

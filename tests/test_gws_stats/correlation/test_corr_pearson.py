@@ -1,11 +1,12 @@
 import os
 
-from gws_core import BaseTestCase, File, Settings, TableImporter, TaskRunner
+from gws_core import (BaseTestCaseLight, File, Settings, TableImporter,
+                      TaskRunner)
 from gws_core.extra import DataProvider
 from gws_stats import PearsonCorrelation
 
 
-class TestPairwiseCorrelationCoef(BaseTestCase):
+class TestPairwiseCorrelationCoef(BaseTestCaseLight):
 
     def test_pearson(self):
         settings = Settings.get_instance()

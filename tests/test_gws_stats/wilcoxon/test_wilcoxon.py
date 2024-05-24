@@ -1,13 +1,12 @@
 
 import os
 
-import numpy
-from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
-                      TableImporter, TaskRunner, ViewTester)
+from gws_core import (BaseTestCaseLight, File, Settings, TableImporter,
+                      TaskRunner)
 from gws_stats import Wilcoxon
 
 
-class TestWicoxon(BaseTestCase):
+class TestWicoxon(BaseTestCaseLight):
 
     def test_process(self):
         settings = Settings.get_instance()

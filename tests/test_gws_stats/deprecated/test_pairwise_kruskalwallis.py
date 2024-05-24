@@ -1,11 +1,11 @@
 import os
 
-from gws_core import (BaseTestCase, ConfigParams, File, GTest, Settings, Table,
-                      TableImporter, TaskRunner, ViewTester)
+from gws_core import (BaseTestCaseLight, File, Settings, TableImporter,
+                      TaskRunner)
 from gws_stats import PairwiseKruskalWallis
 
 
-class TestPairwiseKruskalWallis(BaseTestCase):
+class TestPairwiseKruskalWallis(BaseTestCaseLight):
 
     def test_process(self):
         settings = Settings.get_instance()

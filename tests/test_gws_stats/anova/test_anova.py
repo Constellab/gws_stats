@@ -1,11 +1,12 @@
 import os
 
-from gws_core import BaseTestCase, File, Settings, TableImporter, TaskRunner
+from gws_core import (BaseTestCaseLight, File, Settings, TableImporter,
+                      TaskRunner)
 from gws_core.extra import DataProvider
 from gws_stats import OneWayAnova
 
 
-class TestAnova(BaseTestCase):
+class TestAnova(BaseTestCaseLight):
 
     def test_anova(self):
         settings = Settings.get_instance()

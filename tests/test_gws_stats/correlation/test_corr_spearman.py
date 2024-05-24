@@ -1,10 +1,11 @@
 import os
 
-from gws_core import BaseTestCase, File, Settings, TableImporter, TaskRunner
+from gws_core import (BaseTestCaseLight, File, Settings, TableImporter,
+                      TaskRunner)
 from gws_stats import SpearmanCorrelation
 
 
-class TestPairwiseCorrelationCoef(BaseTestCase):
+class TestPairwiseCorrelationCoef(BaseTestCaseLight):
 
     def test_process(self):
         settings = Settings.get_instance()
