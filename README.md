@@ -43,6 +43,11 @@ This section is for users who want to install the brick manually. It can also be
 
 We recommend installing using Ubuntu 22.04 with python 3.10.
 
+Required packages are listed in the ```settings.json``` file, for now the packages must be installed manually.
+
+```bash 
+pip install statsmodels==0.14.2 numba==0.59.1 pytensor==2.20.0 pymc==5.15.0 arviz==0.18.0
+```
 
 
 #### Usage
