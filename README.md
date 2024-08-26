@@ -56,21 +56,21 @@ pip install statsmodels==0.14.2 numba==0.59.1 pytensor==2.20.0 pymc==5.15.0 arvi
 ▶️ To start the server :
 
 ```bash
-python3 manage.py --runserver
+gws server run
 ```
 
 🕵️ To run a given unit test
 
 ```bash
-python3 manage.py --test [TEST_FILE_NAME]
+gws server test [TEST_FILE_NAME]
 ```
 
-Replace `[TEST_FILE_NAME]` with the name of the test file (without `.py`) in the tests folder.
+Replace `[TEST_FILE_NAME]` with the name of the test file (without `.py`) in the tests folder. Execute this command in the folder of the brick.
 
 🕵️ To run the whole test suite, use the following command:
 
 ```bash
-python3 manage.py --test all
+gws server test all
 ```
 
 📌 VSCode users can use the predefined run configuration in `.vscode/launch.json`.
