@@ -20,22 +20,6 @@
           {
             "name": "statsmodels",
             "version": "0.14.2"
-          },
-          {
-            "name": "numba",
-            "version": "0.59.1"
-          },
-          {
-            "name": "pytensor",
-            "version": "2.20.0"
-          },
-          {
-            "name": "pymc",
-            "version": "5.15.0"
-          },
-          {
-            "name": "arviz",
-            "version": "0.18.0"
           }
         ]
       },
