@@ -28,6 +28,3 @@ class TestWicoxon(BaseTestCaseLight):
         )
         outputs = tester.run()
         wilcoxon_result = outputs['result']
-
-        print(table)
-        print(wilcoxon_result.get_result())

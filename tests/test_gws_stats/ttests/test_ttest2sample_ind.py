@@ -27,6 +27,3 @@ class TestTTestTwoIndependantSamples(BaseTestCaseLight):
         )
         outputs = tester.run()
         ttest2sample_ind_result = outputs['result']
-
-        print(table)
-        print(ttest2sample_ind_result.get_result())

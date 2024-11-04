@@ -30,9 +30,6 @@ class TestNormalTest(BaseTestCaseLight):
         outputs = tester.run()
         normaltest_result = outputs['result']
 
-        print(table)
-        print(normaltest_result)
-
     def test_anova_with_group_comparison(self):
         table = DataProvider.get_iris_table()
         tester = TaskRunner(
@@ -45,6 +42,3 @@ class TestNormalTest(BaseTestCaseLight):
             task_type=NormalTest)
         outputs = tester.run()
         normaltest_result = outputs['result']
-
-        print(table)
-        print(normaltest_result)

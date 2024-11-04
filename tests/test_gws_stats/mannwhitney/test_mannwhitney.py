@@ -27,6 +27,3 @@ class TestMannWhitney(BaseTestCaseLight):
         )
         outputs = tester.run()
         mannwhitney_result = outputs['result']
-
-        print(table)
-        print(mannwhitney_result.get_result())

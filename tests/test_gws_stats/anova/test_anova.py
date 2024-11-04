@@ -29,9 +29,6 @@ class TestAnova(BaseTestCaseLight):
         outputs = tester.run()
         anova_result = outputs['result']
 
-        print(table)
-        print(anova_result.get_statistics_table())
-
     def test_anova_with_group_comparison(self):
         table = DataProvider.get_iris_table()
         tester = TaskRunner(
@@ -44,6 +41,3 @@ class TestAnova(BaseTestCaseLight):
             task_type=OneWayAnova)
         outputs = tester.run()
         result = outputs['result']
-
-        print(table)
-        print(result.get_statistics_table())

@@ -28,6 +28,3 @@ class TestTTestOneSample(BaseTestCaseLight):
         )
         outputs = tester.run()
         ttest1samp_result = outputs['result']
-
-        print(table)
-        print(ttest1samp_result.get_result())

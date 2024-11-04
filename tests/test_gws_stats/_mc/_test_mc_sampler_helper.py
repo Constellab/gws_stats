@@ -26,21 +26,16 @@ class TestMCSampler(BaseTestCaseLight):
         sampler.set_data(data)
         result = sampler.trace(random_seed=[42, 43])
         traces = result.get_traces()
-        print(az.summary(traces))
 
         slope = result.get_slope_traces()
-        print(slope)
-        print(slope.mean())
 
         m = slope.mean()
         self.assertAlmostEqual(m.iat[0], 0.547745, places=3)
         self.assertAlmostEqual(m.iat[1], 0.477969, places=3)
 
         preds = result.get_predictions(num_samples=100)
-        print(preds)
 
         pred_stats = result.get_prediction_stats(num_samples=100)
-        print(pred_stats)
 
     def test_mc_sampler_with_mixtures(self):
         sampler = MCLinRegSampler()
@@ -64,18 +59,13 @@ class TestMCSampler(BaseTestCaseLight):
         sampler.set_data(data)
         result = sampler.trace(random_seed=[42, 43])
         traces = result.get_traces()
-        print(az.summary(traces))
 
         slope = result.get_slope_traces()
-        print(slope)
-        print(slope.mean())
 
         m = slope.mean()
         self.assertAlmostEqual(m.iat[0], 0.523255, places=3)
         self.assertAlmostEqual(m.iat[1], 0.503547, places=3)
 
         preds = result.get_predictions(num_samples=100)
-        print(preds)
 
         pred_stats = result.get_prediction_stats(num_samples=100)
-        print(pred_stats)

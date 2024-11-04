@@ -27,6 +27,3 @@ class TestKruskalWallis(BaseTestCaseLight):
         )
         outputs = tester.run()
         kruskwal_result = outputs['result']
-
-        print(table)
-        print(kruskwal_result.get_result())

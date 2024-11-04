@@ -28,6 +28,3 @@ class TestTTestTwoPairedSamples(BaseTestCaseLight):
         )
         outputs = tester.run()
         ttest2sample_rel_result = outputs['result']
-
-        print(table)
-        print(ttest2sample_rel_result.get_result())

@@ -28,9 +28,6 @@ class TestPValueAdjust(BaseTestCaseLight):
         outputs = tester.run()
         pairwise_correlationcoef_result = outputs['result']
 
-        print(table)
-        print(pairwise_correlationcoef_result.get_full_statistics_table())
-        print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))
         # ---------------------------------------------------------------------
         # run statistical test with reference_column
         tester = TaskRunner(
@@ -42,7 +39,6 @@ class TestPValueAdjust(BaseTestCaseLight):
         pairwise_correlationcoef_result = outputs['result']
 
         stat_table = pairwise_correlationcoef_result.get_full_statistics_table()
-        print(pairwise_correlationcoef_result.get_full_statistics_table())
 
         # ---------------------------------------------------------------------
         # run correction test
@@ -53,7 +49,6 @@ class TestPValueAdjust(BaseTestCaseLight):
         )
         outputs = tester.run()
         table = outputs['table']
-        print(table)
 
         # ---------------------------------------------------------------------
         # run correction test with pval column
@@ -64,4 +59,3 @@ class TestPValueAdjust(BaseTestCaseLight):
         )
         outputs = tester.run()
         table = outputs['table']
-        print(table)

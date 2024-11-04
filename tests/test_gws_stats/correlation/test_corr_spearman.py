@@ -27,8 +27,3 @@ class TestPairwiseCorrelationCoef(BaseTestCaseLight):
         )
         outputs = tester.run()
         pairwise_correlationcoef_result = outputs['result']
-
-        print(table)
-        print(pairwise_correlationcoef_result.get_full_statistics_table())
-        print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))
-        print(pairwise_correlationcoef_result.get_contingency_table(metric="adjusted_pvalue"))

@@ -29,10 +29,6 @@ class TestPairwiseCorrelationCoef(BaseTestCaseLight):
         outputs = tester.run()
         pairwise_correlationcoef_result = outputs['result']
 
-        print(table)
-        print(pairwise_correlationcoef_result.get_full_statistics_table())
-        print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))
-
         # ---------------------------------------------------------------------
         # run statistical test with reference_column
         tester = TaskRunner(
@@ -43,13 +39,8 @@ class TestPairwiseCorrelationCoef(BaseTestCaseLight):
         outputs = tester.run()
         pairwise_correlationcoef_result = outputs['result']
 
-        print(table)
-        print(pairwise_correlationcoef_result.get_full_statistics_table())
-        print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))
-
     def test_pearson_with_group_comparison(self):
         table = DataProvider.get_iris_table()
-        print(table)
         tester = TaskRunner(
             params={'row_tag_key': 'variety',
                     'preselected_column_names': [
@@ -60,9 +51,6 @@ class TestPairwiseCorrelationCoef(BaseTestCaseLight):
             task_type=PearsonCorrelation)
         outputs = tester.run()
         pairwise_correlationcoef_result = outputs['result']
-        print(pairwise_correlationcoef_result.get_full_statistics_table())
-        print(pairwise_correlationcoef_result.get_contingency_table(metric="pvalue"))
 
         tables = pairwise_correlationcoef_result.get_group_statistics_table()
-        print(tables)
         self.assertEqual(len(tables), 3)
