@@ -1,8 +1,6 @@
 
-import numpy as np
-import pandas
-from gws_core import (BoolParam, ConfigParams, InputSpec, InputSpecs,
-                      OutputSpec, OutputSpecs, StrParam, Table,
+from gws_core import (BoolParam, ConfigParams, ConfigSpecs, InputSpec,
+                      InputSpecs, OutputSpec, OutputSpecs, StrParam, Table,
                       resource_decorator, task_decorator)
 from scipy.stats import ttest_ind
 
@@ -103,8 +101,7 @@ class TTestTwoIndepSamples(BasePairwiseStatsTask):
         Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(TTestTwoIndepSamplesResult,
                                                      human_name="Result", short_description="The output result")})
-    config_specs = {
-        **BasePairwiseStatsTask.config_specs,
+    config_specs = ConfigSpecs({
         'equal_variance':
         BoolParam(
             default_value=True, human_name="Equal variance",
@@ -114,7 +111,7 @@ class TTestTwoIndepSamples(BasePairwiseStatsTask):
                                                "two-sided", "less", "greater"],
                                            human_name="Alternative hypothesis",
                                            short_description="The alternative hypothesis chosen for the testing.")
-    }
+    }).merge_specs(BasePairwiseStatsTask.config_specs)
     _remove_nan_before_compute = False
 
     def compute_stats(self, current_data, ref_col, target_col, params: ConfigParams):

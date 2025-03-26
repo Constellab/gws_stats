@@ -1,6 +1,6 @@
 
 import numpy as np
-from gws_core import (BoolParam, ConfigParams, InputSpec, InputSpecs,
+from gws_core import (ConfigParams, ConfigSpecs, InputSpec, InputSpecs,
                       OutputSpec, OutputSpecs, StrParam, Table,
                       resource_decorator, task_decorator)
 from scipy.stats import wilcoxon
@@ -113,8 +113,7 @@ class Wilcoxon(BasePairwiseStatsTask):
         Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(
         WilcoxonResult, human_name="Result", short_description="The output result")})
-    config_specs = {
-        **BasePairwiseStatsTask.config_specs,
+    config_specs = ConfigSpecs({
         "zero_method": StrParam(default_value="wilcox",
                                 allowed_values=["pratt", "wilcox", "zsplit"],
                                 human_name="Method for zero differences treatment",
@@ -128,7 +127,7 @@ class Wilcoxon(BasePairwiseStatsTask):
                          allowed_values=["auto", "exact", "approx"],
                          human_name="Mode",
                          short_description="Method to calculate the p-value.")
-    }
+    }).merge_specs(BasePairwiseStatsTask.config_specs)
 
     def compute_stats(self, current_data, ref_col, target_col, params: ConfigParams):
         mode = params.get_value("mode")

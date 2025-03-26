@@ -1,8 +1,7 @@
 
-import numpy as np
-from gws_core import (ConfigParams, InputSpec, InputSpecs, OutputSpec,
-                      OutputSpecs, StrParam, Table, resource_decorator,
-                      task_decorator)
+from gws_core import (ConfigParams, ConfigSpecs, InputSpec, InputSpecs,
+                      OutputSpec, OutputSpecs, StrParam, Table,
+                      resource_decorator, task_decorator)
 from scipy.stats import mannwhitneyu
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -115,8 +114,7 @@ class MannWhitney(BasePairwiseStatsTask):
         Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(
         MannWhitneyResult, human_name="Result", short_description="The output result")})
-    config_specs = {
-        **BasePairwiseStatsTask.config_specs,
+    config_specs = ConfigSpecs({
         "method":
         StrParam(
             default_value="auto", human_name="Method for p-value computation",
@@ -127,7 +125,7 @@ class MannWhitney(BasePairwiseStatsTask):
             default_value="two-sided",
             allowed_values=["two-sided", "less", "greater"],
             human_name="Alternative hypothesis",
-            short_description="The alternative hypothesis chosen for the testing.")}
+            short_description="The alternative hypothesis chosen for the testing.")}).merge_specs(BasePairwiseStatsTask.config_specs)
 
     def compute_stats(self, current_data, ref_col, target_col, params: ConfigParams):
         method = params.get_value("method")

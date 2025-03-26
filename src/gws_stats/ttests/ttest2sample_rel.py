@@ -1,7 +1,6 @@
 
 import numpy as np
-import pandas
-from gws_core import (BoolParam, ConfigParams, InputSpec, InputSpecs,
+from gws_core import (ConfigParams, ConfigSpecs, InputSpec, InputSpecs,
                       OutputSpec, OutputSpecs, StrParam, Table,
                       resource_decorator, task_decorator)
 from scipy.stats import ttest_rel
@@ -28,8 +27,8 @@ class TTestTwoRelatedSamplesResult(BasePairwiseStatsResult):
 # *****************************************************************************
 
 
-@ task_decorator("TTestTwoRelatedSamples", human_name="T-test with rel. samples",
-                 short_description="Test that the means of two related samples are equal. Performs pairwise analysis for more than two samples.")
+@task_decorator("TTestTwoRelatedSamples", human_name="T-test with rel. samples",
+                short_description="Test that the means of two related samples are equal. Performs pairwise analysis for more than two samples.")
 class TTestTwoRelatedSamples(BasePairwiseStatsTask):
     """
     Compute the T-test for the means of related samples, from a given reference sample.
@@ -103,14 +102,13 @@ class TTestTwoRelatedSamples(BasePairwiseStatsTask):
         Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(TTestTwoRelatedSamplesResult,
                                                      human_name="Result", short_description="The output result")})
-    config_specs = {
-        **BasePairwiseStatsTask.config_specs,
+    config_specs = ConfigSpecs({
         "alternative_hypothesis": StrParam(default_value="two-sided",
                                            allowed_values=[
                                                "two-sided", "less", "greater"],
                                            human_name="Alternative hypothesis",
                                            short_description="The alternative hypothesis chosen for the testing")
-    }
+    }).merge_specs(BasePairwiseStatsTask.config_specs)
     _remove_nan_before_compute = True  # ensure that related sample are paired!
 
     def compute_stats(self, current_data, ref_col, target_col, params: ConfigParams):

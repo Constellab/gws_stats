@@ -2,7 +2,7 @@
 import numpy as np
 import pandas
 from gws_core import (BadRequestException, ConfigParams, FloatParam, InputSpec,
-                      InputSpecs, ListParam, OutputSpec, OutputSpecs, StrParam,
+                      InputSpecs, OutputSpec, OutputSpecs, StrParam, ConfigSpecs,
                       Table, Task, TaskInputs, TaskOutputs, resource_decorator,
                       task_decorator)
 from statsmodels.stats.multitest import multipletests
@@ -48,7 +48,7 @@ class PValueAdjust(Task):
                              short_description="The input table of p-values")})
     output_specs = OutputSpecs({'table': OutputSpec(Table, human_name="Result",
                                                     short_description="The output table containing adjected p-values")})
-    config_specs = {
+    config_specs = ConfigSpecs({
         "pval_column_name": StrParam(
             default_value=None, optional=True, human_name="PValue column name",
             short_description="The name of the column containing p-values. If not given, the columns with values between 0 and 1 are supposed to contain p-values."),
@@ -60,7 +60,7 @@ class PValueAdjust(Task):
         "alpha": FloatParam(
             default_value=0.05, min_value=0, max_value=1, human_name="Alpha",
             short_description="FWER, family-wise error rate"),
-    }
+    })
 
     def compute_stats(self, current_data, params: ConfigParams):
         """ compute stats """
@@ -109,7 +109,7 @@ class PValueAdjust(Task):
                     stat_result, columns=["Adjusted_"+target_col_name])
             else:
                 df = pandas.DataFrame(stat_result, columns=[
-                                      "Adjusted_"+target_col_name])
+                    "Adjusted_"+target_col_name])
                 all_result = pandas.concat(
                     [all_result, df], axis=0, ignore_index=True)
 

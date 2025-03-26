@@ -1,7 +1,6 @@
 
-import numpy as np
 import pandas
-from gws_core import BoolParam, ParamSet, StrParam, Table
+from gws_core import ParamSet, StrParam, ConfigSpecs
 from pandas import DataFrame
 from pandas.api.types import is_string_dtype
 
@@ -14,7 +13,7 @@ class SimpleDesignHelper(BaseDesignHelper):
 
     @classmethod
     def create_training_design_param_set(cls):
-        return ParamSet({
+        return ParamSet(ConfigSpecs({
             'target_name':
             StrParam(
                 human_name="Target name",
@@ -28,7 +27,7 @@ class SimpleDesignHelper(BaseDesignHelper):
             StrParam(
                 default_value="auto", allowed_values=["auto", cls.CATEGROICAL_TYPE, cls.NUMERICAL_TYPE],
                 human_name="Target type",
-                short_description="The type of the target (categorical or numerical). Set 'auto' to infer the correct type. Notice: targets comming from row_tags are allways considered as categorical")},
+                short_description="The type of the target (categorical or numerical). Set 'auto' to infer the correct type. Notice: targets comming from row_tags are allways considered as categorical")}),
             human_name="Training design",
             short_description="Define the training design, i.e. the target Y to use for the model.")
 

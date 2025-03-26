@@ -2,7 +2,7 @@
 import pandas
 from gws_core import (BoolParam, ConfigParams, InputSpec, InputSpecs,
                       OutputSpec, OutputSpecs, ParamSet, StrParam, Table,
-                      TableUnfolderHelper, Task, TaskInputs, TaskOutputs,
+                      TableUnfolderHelper, Task, TaskInputs, TaskOutputs, ConfigSpecs,
                       resource_decorator, task_decorator)
 from pandas import DataFrame
 from scipy.stats import normaltest
@@ -50,22 +50,22 @@ class NormalTest(Task):
         Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(NormalTestResultTable, human_name="Result",
                                                      short_description="The output result")})
-    config_specs = {
+    config_specs = ConfigSpecs({
         "preselected_column_names":
-        ParamSet({
+        ParamSet(ConfigSpecs({
             "name": StrParam(
                 default_value="", human_name="Pre-selected columns names", optional=True,
                 short_description="The name of the column(s) to pre-select"),
             "is_regex": BoolParam(
                 default_value=False, human_name="Is text pattern?",
                 short_description="Set True if it is a text pattern (regular expression), False otherwise")
-        }, human_name="Pre-selected column names", short_description=f"The names of column to pre-select for comparison. By default, the first {DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used", optional=True),
+        }), human_name="Pre-selected column names", short_description=f"The names of column to pre-select for comparison. By default, the first {DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used", optional=True),
         "row_tag_key":
         StrParam(
             default_value=None, optional=True, human_name="Row tag key (for group-wise testing)",
             visibility=StrParam.PROTECTED_VISIBILITY,
             short_description="The key of the row tag (representing the group axis) along which one would like to do tests")
-    }
+    })
 
     def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs["table"]

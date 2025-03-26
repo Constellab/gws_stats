@@ -3,18 +3,17 @@ from abc import abstractmethod
 
 import numpy as np
 import pandas
-from gws_core import (BadRequestException, BoolParam, ConfigParams, FloatParam,
-                      InputSpec, InputSpecs, ListParam, OutputSpec,
-                      OutputSpecs, ParamSet, StrParam, Table,
+from gws_core import (BoolParam, ConfigParams, FloatParam,
+                      InputSpec, InputSpecs, OutputSpec,
+                      OutputSpecs, ParamSet, StrParam, Table, ConfigSpecs,
                       TableUnfolderHelper, Task, TaskInputs, TaskOutputs,
                       task_decorator)
-from pandas import concat
 from statsmodels.stats.multitest import multipletests
 
 from ..base.base_population_stats_result import BasePopulationStatsResult
 
 
-@ task_decorator("BasePopulationStatsTask", hide=True)
+@task_decorator("BasePopulationStatsTask", hide=True)
 class BasePopulationStatsTask(Task):
     """
     BasePopulationStatsTask
@@ -71,23 +70,23 @@ class BasePopulationStatsTask(Task):
         Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(BasePopulationStatsResult, human_name="Result",
                                                      short_description="The output result")})
-    config_specs = {
+    config_specs = ConfigSpecs({
         "preselected_column_names":
-        ParamSet({
+        ParamSet(ConfigSpecs({
             "name": StrParam(
                 default_value="", human_name="Pre-selected columns names", optional=True,
                 short_description="The name of the column(s) to pre-select"),
             "is_regex": BoolParam(
                 default_value=False, human_name="Is text pattern?",
                 short_description="Set True if it is a text pattern (regular expression), False otherwise")
-        }, human_name="Pre-selected column names", short_description=f"The names of column to pre-select for comparison. By default, the first {DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used", optional=True),
+        }), human_name="Pre-selected column names", short_description=f"The names of column to pre-select for comparison. By default, the first {DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used", optional=True),
         "row_tag_key":
         StrParam(
             default_value=None, optional=True, human_name="Row tag key (for group-wise comparisons)",
             visibility=StrParam.PROTECTED_VISIBILITY,
             short_description="The key of the row tag (representing the group axis) along which one would like to compare each column"),
         "adjust_pvalue":
-        ParamSet({
+        ParamSet(ConfigSpecs({
             "method": StrParam(
                 default_value=DEFAULT_ADJUST_METHOD, human_name="Correction method",
                 allowed_values=["bonferroni", "fdr_bh", "fdr_by", "fdr_tsbh", "fdr_tsbky",
@@ -96,8 +95,8 @@ class BasePopulationStatsTask(Task):
             "alpha": FloatParam(
                 default_value=DEFAULT_ADJUST_ALPHA, min_value=0, max_value=1, human_name="Alpha",
                 short_description=f"FWER, family-wise error rate Default is {DEFAULT_ADJUST_ALPHA}", visibility=StrParam.PROTECTED_VISIBILITY)
-        }, human_name="Adjust p-values", short_description="Adjust p-values for multiple tests. It is only used when the `row_tag_key` is set.", max_number_of_occurrences=1, optional=True, visibility=ParamSet.PROTECTED_VISIBILITY)
-    }
+        }), human_name="Adjust p-values", short_description="Adjust p-values for multiple tests. It is only used when the `row_tag_key` is set.", max_number_of_occurrences=1, optional=True, visibility=ParamSet.PROTECTED_VISIBILITY)
+    })
 
     _remove_nan_before_compute = True
     _is_nan_warning_shown = False

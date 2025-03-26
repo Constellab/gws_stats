@@ -1,8 +1,8 @@
 
 import numpy as np
-from gws_core import (ConfigParams, InputSpec, InputSpecs, OutputSpec,
-                      OutputSpecs, StrParam, Table, TaskInputs, TaskOutputs,
-                      resource_decorator, task_decorator)
+from gws_core import (ConfigParams, ConfigSpecs, InputSpec, InputSpecs,
+                      OutputSpec, OutputSpecs, Table, resource_decorator,
+                      task_decorator)
 from scipy.stats import spearmanr
 
 from ..base.base_pairwise_stats_result import BasePairwiseStatsResult
@@ -105,9 +105,6 @@ class SpearmanCorrelation(BasePairwiseStatsTask):
         Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(SpearmanCorrelationResult, human_name="Result",
                                                      short_description="The output result")})
-    config_specs = {
-        **BasePairwiseStatsTask.config_specs,
-    }
 
     _remove_nan_before_compute = False
 

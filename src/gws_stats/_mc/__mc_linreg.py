@@ -1,5 +1,5 @@
 
-from gws_core import (ConfigParams, FloatParam, InputSpec, OutputSpec,
+from gws_core import (ConfigParams, FloatParam, InputSpec, OutputSpec, ConfigSpecs, InputSpecs, OutputSpecs,
                       ParamSet, StrParam, Table, Task, TaskInputs, TaskOutputs,
                       resource_decorator, task_decorator)
 
@@ -45,27 +45,27 @@ class MCLinearRegressor(Task):
         Table, human_name="Table", short_description="The input table")})
     output_specs = OutputSpecs({'result': OutputSpec(MCLinearRegressorTable, human_name="result",
                                                      short_description="The output result")})
-    config_specs = {
+    config_specs = ConfigSpecs({
         'training_design': SimpleDesignHelper.create_training_design_param_set(),
-        # 'intercept': ParamSet({
+        # 'intercept': ParamSet(ConfigSpecs({
         #     "func": StrParam(allowed_values=["Normal", "TruncatedNormal", "HalfNormal"], human_name="Distribution function"),
         #     "mu": FloatParam(value, human_name="Distribution function"),
         #     "params": StrParam(human_name="Parameters", short_description="The parameters (e.g. mu=1.2, sigma=3). See documentation."),
-        # }, human_name="Intercept"),
-        'slope': ParamSet({
+        # }), human_name="Intercept"),
+        'slope': ParamSet(ConfigSpecs({
             "func": StrParam(allowed_values=["Normal", "TruncatedNormal", "HalfNormal"], human_name="Function", short_description="Distribution function"),
             "mu": FloatParam(human_name="Mean", short_description="Distribution mean"),
             "sigma": FloatParam(human_name="Sigma", short_description="Distribution sigma"),
             "lb": FloatParam(optional=True, human_name="Lower bound", short_description="The upper bound of the distribution. It is required for TruncatedNormal and used as constrain in any case."),
             "ub": FloatParam(optional=True, human_name="Upper bound", short_description="The lower bound of the distribution. It is required for TruncatedNormal and used as constrain in any case."),
-        }, human_name="Slope", max_number_of_occurrences=1),
-        'sigma': ParamSet({
+        }), human_name="Slope", max_number_of_occurrences=1),
+        'sigma': ParamSet(ConfigSpecs({
             "func": StrParam(allowed_values=["Normal", "TruncatedNormal", "HalfNormal", "HalfCauchy"], human_name="Distribution function"),
             "mu": FloatParam(optional=True, default=0.0, human_name="Mean", short_description="Distribution mean. Only for Normal-type distribution"),
             "sigma": FloatParam(optional=True, default=10, human_name="Sigma", short_description="Distribution sigma. Only for Normal-type distribution"),
             "beta": FloatParam(optional=True, default=10, human_name="Sigma", short_description="Distribution beta. Only for HalfCauchy distribution"),
-        }, human_name="Sigma", max_number_of_occurrences=1)
-    }
+        }), human_name="Sigma", max_number_of_occurrences=1)
+    })
 
     def run(self, params: ConfigParams, inputs: TaskInputs) -> TaskOutputs:
         table = inputs["table"]
