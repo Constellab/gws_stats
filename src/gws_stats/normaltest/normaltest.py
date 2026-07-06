@@ -59,7 +59,7 @@ class NormalTest(Task):
             "is_regex": BoolParam(
                 default_value=False, human_name="Is text pattern?",
                 short_description="Set True if it is a text pattern (regular expression), False otherwise")
-        }), human_name="Pre-selected column names", short_description=f"The names of column to pre-select for comparison. By default, the first {DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used", optional=True),
+        }), human_name="Pre-selected column names", short_description=f"The names of column to pre-select for comparison. By default, the first {DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used", min_number_of_occurrences=0),
         "row_tag_key":
         StrParam(
             default_value=None, optional=True, human_name="Row tag key (for group-wise testing)",

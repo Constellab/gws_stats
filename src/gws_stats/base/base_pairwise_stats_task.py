@@ -92,7 +92,7 @@ class BasePairwiseStatsTask(Task):
             "is_regex": BoolParam(
                 default_value=False, human_name="Is text pattern?",
                 short_description="Set True if it is a text pattern (regular expression), False otherwise")
-        }), human_name="Pre-selected column names", short_description=f"The names of column to pre-select for comparison. By default, the first {DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used", optional=True),
+        }), human_name="Pre-selected column names", short_description=f"The names of column to pre-select for comparison. By default, the first {DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used", min_number_of_occurrences=0),
         # ListParam(
         #     default_value=None, optional=True, human_name="Selected columns names",
         #     short_description=f"The names of column to pre-select for comparison. By default, the first {DEFAULT_MAX_NUMBER_OF_COLUMNS_TO_USE} columns are used"),
@@ -115,7 +115,7 @@ class BasePairwiseStatsTask(Task):
             "alpha": FloatParam(
                 default_value=DEFAULT_ADJUST_ALPHA, min_value=0, max_value=1, human_name="Alpha",
                 short_description=f"FWER, family-wise error rate. Default is {DEFAULT_ADJUST_ALPHA}", visibility=StrParam.PROTECTED_VISIBILITY)
-        }), human_name="Adjust p-values", short_description="Adjust p-values for multiple tests.", max_number_of_occurrences=1, optional=True, visibility=ParamSet.PROTECTED_VISIBILITY)
+        }), human_name="Adjust p-values", short_description="Adjust p-values for multiple tests.", max_number_of_occurrences=1, min_number_of_occurrences=0, visibility=ParamSet.PROTECTED_VISIBILITY)
     })
 
     _remove_nan_before_compute = True
